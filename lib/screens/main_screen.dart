@@ -5,6 +5,7 @@ import 'dart:math' as math;
 import '../providers/nguoi_dung_provider.dart';
 import 'home_tab.dart';
 import 'splash_screen.dart';
+import 'chatbot_screen.dart';
 
 // Import your actual screens below:
 // import 'tuvung_screen.dart';
@@ -138,7 +139,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       case 0: return const _PlaceholderTab(icon: Icons.style_rounded, title: 'Từ Vựng IT', color: Color(0xFF00D4FF), desc: '3,000+ từ vựng chuyên ngành');
       case 1: return const _PlaceholderTab(icon: Icons.quiz_rounded, title: 'Bài Kiểm Tra', color: Color(0xFF7B2FFF), desc: 'Luyện tập & đánh giá năng lực');
       case 2: return const HomeTab();
-      case 3: return const _PlaceholderTab(icon: Icons.smart_toy_rounded, title: 'AI English Tutor', color: Color(0xFF00FF94), desc: 'Học cùng trợ lý AI thông minh');
+      return const ChatbotScreen();
       case 4: return const _ProfileTab();
       default: return const SizedBox();
     }
