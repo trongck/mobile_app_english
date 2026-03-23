@@ -9,7 +9,7 @@ import 'dart:math' as math;
 // ════════════════════════════════════════════════════════════════════════════
 //  CONSTANTS
 // ════════════════════════════════════════════════════════════════════════════
-const _kGeminiKey = 'AIzaSyC4ZsHV65avNdpToCWOZxrj7H28dGEAUdI';
+const _kGeminiKey = 'AIzaSyBPAY-7dRziGfif8h5u0v5tEA9Xa_fp81g';
 const _kGeminiModel = 'gemini-3.1-flash-lite-preview';
 const _kGeminiUrl =
     'https://generativelanguage.googleapis.com/v1beta/models/$_kGeminiModel:generateContent?key=$_kGeminiKey';

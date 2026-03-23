@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
- import 'onboarding_screen.dart';
+import 'onboarding_screen.dart';
 import '../providers/gt_provider.dart';
 
 class IntroScreen extends StatefulWidget {
@@ -87,10 +87,19 @@ class _IntroScreenState extends State<IntroScreen>
     _animController.forward();
   }
 
+  // ─── Responsive helper ────────────────────────────────────────────────────
+  // Trả về kích thước tỉ lệ theo chiều cao màn hình (tránh overflow).
+  double _rh(BuildContext context, double factor) =>
+      MediaQuery.of(context).size.height * factor;
+
+  double _rw(BuildContext context, double factor) =>
+      MediaQuery.of(context).size.width * factor;
+
   @override
   Widget build(BuildContext context) {
     final gtProvider = context.watch<GTProvider>();
     final size = MediaQuery.of(context).size;
+    final padding = MediaQuery.of(context).padding;
 
     // ── Loading ──────────────────────────────────────────────────────────────
     if (gtProvider.isLoading) {
@@ -142,11 +151,37 @@ class _IntroScreenState extends State<IntroScreen>
 
     final accentColor = _pageColors[_currentIndex % _pageColors.length];
 
+    // ── Responsive layout breakpoints ────────────────────────────────────────
+    // Phân loại thiết bị theo chiều cao thực (sau khi trừ system bars)
+    final availH = size.height - padding.top - padding.bottom;
+
+    // Nhỏ: < 600 (iPhone SE, Galaxy A series nhỏ)
+    // Trung: 600 – 750 (iPhone 14, Pixel 6)
+    // Lớn: > 750 (iPhone 14 Pro Max, tablet compact)
+    final isSmall = availH < 600;
+    final isLarge = availH > 750;
+
+    // ── Tỉ lệ ảnh: chiếm ~38% chiều cao khả dụng, tối đa 280, tối thiểu 160
+    final imageHeight = (availH * 0.38).clamp(160.0, 280.0);
+
+    // ── Font sizes ────────────────────────────────────────────────────────────
+    final titleSize = isSmall ? 18.0 : isLarge ? 24.0 : 21.0;
+    final descSize = isSmall ? 13.0 : 15.0;
+    final logoSize = isSmall ? 26.0 : 30.0;
+    final brandFontSize = isSmall ? 15.0 : 17.0;
+
+    // ── Spacing ───────────────────────────────────────────────────────────────
+    final topBarPadding = isSmall ? 12.0 : 20.0;
+    final spacerAfterImage = isSmall ? 8.0 : 14.0;
+    final spacerAfterBadge = isSmall ? 14.0 : 20.0;
+    final spacerAfterTitle = isSmall ? 12.0 : 20.0;
+    final hzPadding = isSmall ? 24.0 : 32.0;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // ── Nền gradient ─────────────────────────────────────────────────
+          // ── Nền gradient ───────────────────────────────────────────────────
           AnimatedContainer(
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
@@ -162,7 +197,7 @@ class _IntroScreenState extends State<IntroScreen>
             ),
           ),
 
-          // ── Vòng trang trí trên ──────────────────────────────────────────
+          // ── Vòng trang trí trên ────────────────────────────────────────────
           Positioned(
             top: -size.width * 0.25,
             right: -size.width * 0.25,
@@ -178,7 +213,7 @@ class _IntroScreenState extends State<IntroScreen>
             ),
           ),
 
-          // ── Vòng trang trí dưới ──────────────────────────────────────────
+          // ── Vòng trang trí dưới ────────────────────────────────────────────
           Positioned(
             bottom: 80,
             left: -size.width * 0.15,
@@ -194,14 +229,14 @@ class _IntroScreenState extends State<IntroScreen>
             ),
           ),
 
-          // ── Nội dung chính ────────────────────────────────────────────────
+          // ── Nội dung chính ─────────────────────────────────────────────────
           SafeArea(
             bottom: false,
             child: Column(
               children: [
-                // Branding bar
+                // ── Branding bar ──────────────────────────────────────────────
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+                  padding: EdgeInsets.fromLTRB(24, topBarPadding, 24, 0),
                   child: Row(
                     children: [
                       AnimatedContainer(
@@ -212,18 +247,18 @@ class _IntroScreenState extends State<IntroScreen>
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: Image.asset(
-                          'assets/icon/logo.png', // đường dẫn ảnh của bạn
-                          width: 30,
-                          height: 30,
+                          'assets/icon/logo.png',
+                          width: logoSize,
+                          height: logoSize,
                         ),
                       ),
                       const SizedBox(width: 10),
-                      const Text(
+                      Text(
                         'DevTalk English',
                         style: TextStyle(
-                          fontSize: 17,
+                          fontSize: brandFontSize,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1A2E),
+                          color: const Color(0xFF1A1A2E),
                           letterSpacing: -0.3,
                         ),
                       ),
@@ -231,12 +266,9 @@ class _IntroScreenState extends State<IntroScreen>
                   ),
                 ),
 
-
-                const SizedBox(height: 150),
-                // PageView
+                // ── PageView ──────────────────────────────────────────────────
                 Expanded(
                   child: PageView.builder(
-                  
                     controller: _pageController,
                     itemCount: intros.length,
                     onPageChanged: (i) => _onPageChanged(i, intros.length),
@@ -250,15 +282,15 @@ class _IntroScreenState extends State<IntroScreen>
                         child: SlideTransition(
                           position: _slideAnim,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 16,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: hzPadding,
+                              vertical: isSmall ? 8 : 16,
                             ),
-                            
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                // ── Ảnh 3D bo viền ──────────────────────
+                                // ── Ảnh 3D bo viền ──────────────────────────
                                 TweenAnimationBuilder<double>(
                                   key: ValueKey(_imageAnimKey),
                                   tween: Tween(begin: 0.0, end: 1.0),
@@ -274,10 +306,10 @@ class _IntroScreenState extends State<IntroScreen>
                                       child: child,
                                     );
                                   },
-                                  
                                   child: Container(
-                                    width: 520,
-                                    height: 300,
+                                    // Chiều rộng tối đa = screen width - padding ngang
+                                    width: double.infinity,
+                                    height: imageHeight,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(28),
                                       color: Colors.white,
@@ -300,14 +332,14 @@ class _IntroScreenState extends State<IntroScreen>
                                       ],
                                     ),
                                     child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(25),
                                       child: Image.asset(
                                         intro.anh ?? 'assets/icons/intro.png',
                                         fit: BoxFit.cover,
                                         errorBuilder: (_, __, ___) => Center(
                                           child: Icon(
                                             icon,
-                                            size: 10,
+                                            size: imageHeight * 0.25,
                                             color: color.withOpacity(0.6),
                                           ),
                                         ),
@@ -316,9 +348,9 @@ class _IntroScreenState extends State<IntroScreen>
                                   ),
                                 ),
 
-                                const SizedBox(height: 14),
+                                SizedBox(height: spacerAfterImage),
 
-                                // ── Badge số trang (sát ảnh) ─────────────
+                                // ── Badge số trang ───────────────────────────
                                 AnimatedContainer(
                                   duration: const Duration(milliseconds: 500),
                                   padding: const EdgeInsets.symmetric(
@@ -332,40 +364,51 @@ class _IntroScreenState extends State<IntroScreen>
                                   child: Text(
                                     '${index + 1} / ${intros.length}',
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: isSmall ? 11 : 12,
                                       fontWeight: FontWeight.w600,
                                       color: color,
                                     ),
                                   ),
                                 ),
 
-                                const SizedBox(height: 20),
+                                SizedBox(height: spacerAfterBadge),
 
-                                // Tiêu đề
+                                // ── Tiêu đề ──────────────────────────────────
                                 Text(
                                   intro.tieuDe,
-                                  style: const TextStyle(
-                                    fontSize: 22,
+                                  style: TextStyle(
+                                    fontSize: titleSize,
                                     fontWeight: FontWeight.w800,
-                                    color: Color(0xFF1A1A2E),
+                                    color: const Color(0xFF1A1A2E),
                                     height: 1.35,
                                     letterSpacing: -0.4,
                                   ),
                                   textAlign: TextAlign.center,
+                                  // Tránh tràn khi tiêu đề quá dài
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
 
-                                const SizedBox(height: 20),
+                                SizedBox(height: spacerAfterTitle),
 
-                                // Mô tả
-                                Text(
-                                  intro.moTa ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 15,
-                                    height: 1.65,
-                                    color: Color(0xFF5C5C7A),
-                                    fontWeight: FontWeight.w400,
+                                // ── Mô tả ─────────────────────────────────────
+                                // Dùng Flexible để mô tả co lại nếu không đủ chỗ
+                                Flexible(
+                                  child: Text(
+                                    intro.moTa ?? '',
+                                    style: TextStyle(
+                                      fontSize: descSize,
+                                      height: isSmall ? 1.5 : 1.65,
+                                      color: const Color(0xFF5C5C7A),
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    // Giới hạn số dòng trên màn hình nhỏ
+                                    maxLines: isSmall ? 4 : null,
+                                    overflow: isSmall
+                                        ? TextOverflow.ellipsis
+                                        : TextOverflow.visible,
                                   ),
-                                  textAlign: TextAlign.center,
                                 ),
                               ],
                             ),
@@ -379,7 +422,7 @@ class _IntroScreenState extends State<IntroScreen>
             ),
           ),
 
-          // ── Thanh điều hướng phía dưới ────────────────────────────────────
+          // ── Thanh điều hướng phía dưới ─────────────────────────────────────
           Align(
             alignment: Alignment.bottomCenter,
             child: _isLastPage
@@ -391,16 +434,12 @@ class _IntroScreenState extends State<IntroScreen>
     );
   }
 
-  // ─── Widget: Nút "Bắt đầu trải nghiệm" ─────────────────────────────────────
-
+  // ─── Widget: Nút "Bắt đầu trải nghiệm" ──────────────────────────────────────
   Widget _buildBatDauButton(Color accentColor) {
+    final bottomPad = MediaQuery.of(context).padding.bottom;
+
     return Padding(
-      padding: EdgeInsets.fromLTRB(
-        24,
-        0,
-        24,
-        MediaQuery.of(context).padding.bottom + 24,
-      ),
+      padding: EdgeInsets.fromLTRB(24, 0, 24, bottomPad + 24),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         child: ElevatedButton(
@@ -413,13 +452,15 @@ class _IntroScreenState extends State<IntroScreen>
             ),
             elevation: 0,
           ),
-           onPressed: () => Navigator.pushReplacement(
+          onPressed: () => Navigator.pushReplacement(
             context,
             PageRouteBuilder(
-            pageBuilder: (_, a, __) => const OnboardingScreen(),
-            transitionsBuilder: (_, a, __, child) => FadeTransition(opacity: a, child: child),
-            transitionDuration: const Duration(milliseconds: 500),
-          ),  ),
+              pageBuilder: (_, a, __) => const OnboardingScreen(),
+              transitionsBuilder: (_, a, __, child) =>
+                  FadeTransition(opacity: a, child: child),
+              transitionDuration: const Duration(milliseconds: 500),
+            ),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
@@ -440,17 +481,13 @@ class _IntroScreenState extends State<IntroScreen>
     );
   }
 
-  // ─── Widget: Thanh "Bỏ qua / Dots / Tiếp" ──────────────────────────────────
-
+  // ─── Widget: Thanh "Bỏ qua / Dots / Tiếp" ────────────────────────────────────
   Widget _buildNavBar(int total, Color accentColor) {
+    final bottomPad = MediaQuery.of(context).padding.bottom;
+
     return Container(
       color: Colors.transparent,
-      padding: EdgeInsets.fromLTRB(
-        24,
-        16,
-        24,
-        MediaQuery.of(context).padding.bottom + 16,
-      ),
+      padding: EdgeInsets.fromLTRB(24, 16, 24, bottomPad + 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -481,7 +518,7 @@ class _IntroScreenState extends State<IntroScreen>
               dotHeight: 8,
               dotWidth: 8,
               activeDotColor: accentColor,
-              dotColor: Color(0xFFD1D1E0),
+              dotColor: const Color(0xFFD1D1E0),
               expansionFactor: 3,
             ),
             onDotClicked: (index) => _pageController.animateToPage(

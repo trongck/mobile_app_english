@@ -129,7 +129,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
             child: Column(children: [
               const SizedBox(height: 24),
               SizedBox(
-                height: 140,
+                height: 180,
                 child: PageView.builder(
                   controller: _bannerCtrl,
                   itemCount: _banners.length,
@@ -137,7 +137,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
                   itemBuilder: (_, i) => _BannerCard(data: _banners[i]),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(_banners.length, (i) {
                 final isActive = i == _currentBanner;
                 return AnimatedContainer(
@@ -206,7 +206,7 @@ class _HomeTabState extends State<HomeTab> with TickerProviderStateMixin {
           // ── Quick stats ──────────────────────────────────────────────────
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
+              padding: const EdgeInsets.fromLTRB(20, 28, 20, 10),
               child: const Text('Thống kê của bạn', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
             ),
           ),
@@ -334,7 +334,7 @@ class _BannerCard extends StatelessWidget {
             Text(data.subtitle, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
           ]),
         ),
-        Positioned(right: 18, bottom: 18, child: Container(
+        Positioned(right: 18, bottom: 10, child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(10)),
           child: const Text('Xem ngay →', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
@@ -511,7 +511,7 @@ class _StatsGrid extends StatelessWidget {
       itemBuilder: (_, i) {
         final s = stats[i];
         return Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.04),
             borderRadius: BorderRadius.circular(16),
