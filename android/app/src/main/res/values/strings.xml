@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="facebook_app_id">YOUR_APP_ID</string>
-    <string name="fb_login_protocol_scheme">fbYOUR_APP_ID</string>
-    <string name="facebook_client_token">YOUR_CLIENT_TOKEN</string>
+    <string name="facebook_app_id">1324</string>
+    <string name="fb_login_protocol_scheme">fb1324</string>
+    <string name="facebook_client_token">5678</string>
     <string name="app_name">DevTalk English</string>
     
 </resources>
