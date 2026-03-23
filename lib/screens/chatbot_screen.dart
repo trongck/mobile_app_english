@@ -9,8 +9,8 @@ import 'dart:math' as math;
 // ════════════════════════════════════════════════════════════════════════════
 //  CONSTANTS
 // ════════════════════════════════════════════════════════════════════════════
-const _kGeminiKey = 'AIzaSyDXPQjK4I7Tw7vI0QCNxEkswrUJ7VF0wcc';
-const _kGeminiModel = 'gemini-3-flash-preview'; // dùng model ổn định
+const _kGeminiKey = 'AIzaSyC4ZsHV65avNdpToCWOZxrj7H28dGEAUdI';
+const _kGeminiModel = 'gemini-3.1-flash-lite-preview';
 const _kGeminiUrl =
     'https://generativelanguage.googleapis.com/v1beta/models/$_kGeminiModel:generateContent?key=$_kGeminiKey';
 
@@ -60,7 +60,7 @@ class GeminiService {
       ],
     });
 
-    // Add history
+    // Add history (already contains all past exchanges)
     for (final msg in history) {
       contents.add(msg);
     }
@@ -157,6 +157,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
   final TextEditingController _inputCtrl = TextEditingController();
   final ScrollController _scrollCtrl = ScrollController();
   final List<ChatMessage> _messages = [];
+  // History chỉ chứa các cặp user/model ĐÃ hoàn thành (không bao gồm tin nhắn hiện tại)
   final List<Map<String, dynamic>> _history = [];
 
   late AnimationController _bgAnim;
@@ -168,12 +169,15 @@ class _ChatbotScreenState extends State<ChatbotScreen>
   bool _isListening = false;
   bool _isSpeaking = false;
   bool _ttsEnabled = true;
-  bool _speechAvailable = false;
-  bool _ttsReady = false;
 
-  // Speech & TTS
+  // ── STT ─────────────────────────────────────────────────────────────────
   final stt.SpeechToText _speech = stt.SpeechToText();
+  bool _speechAvailable = false;
+  bool _sttInitialized = false;
+
+  // ── TTS ─────────────────────────────────────────────────────────────────
   final FlutterTts _tts = FlutterTts();
+  bool _ttsReady = false;
 
   static const _modeColors = {
     ChatMode.freeChat: Color(0xFF00D4FF),
@@ -188,6 +192,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
   @override
   void initState() {
     super.initState();
+
     _bgAnim = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
@@ -203,96 +208,105 @@ class _ChatbotScreenState extends State<ChatbotScreen>
       duration: const Duration(milliseconds: 800),
     )..repeat(reverse: true);
 
-    _initSpeech();
     _initTts();
+    _initSpeech();
     _addWelcomeMessage();
   }
 
-  // ── FIX: Khởi tạo STT với error handling đầy đủ ──────────────────────────
-  Future<void> _initSpeech() async {
+  // ── FIX: Khởi tạo TTS đúng cách ─────────────────────────────────────────
+  Future<void> _initTts() async {
     try {
-      _speechAvailable = await _speech.initialize(
+      // 1. Set completion handlers TRƯỚC
+      _tts.setStartHandler(() {
+        debugPrint('[TTS] ▶ Started');
+        if (mounted) setState(() => _isSpeaking = true);
+      });
+
+      _tts.setCompletionHandler(() {
+        debugPrint('[TTS] ✔ Completed');
+        if (mounted) setState(() => _isSpeaking = false);
+      });
+
+      _tts.setCancelHandler(() {
+        debugPrint('[TTS] ✖ Cancelled');
+        if (mounted) setState(() => _isSpeaking = false);
+      });
+
+      _tts.setErrorHandler((msg) {
+        debugPrint('[TTS] ✖ Error: $msg');
+        if (mounted) setState(() => _isSpeaking = false);
+      });
+
+      // 2. Cấu hình engine
+      await _tts.setLanguage('en-US');
+      await _tts.setSpeechRate(0.75);
+      await _tts.setVolume(1.0);
+      await _tts.setPitch(1.0);
+
+      // 3. QUAN TRỌNG: KHÔNG dùng awaitSpeakCompletion(true)
+      //    Nó block main isolate và gây "TTS not bound" trên Android
+      await _tts.awaitSpeakCompletion(false);
+
+      _ttsReady = true;
+      debugPrint('[TTS] ✔ Ready');
+      if (mounted) setState(() {});
+    } catch (e) {
+      debugPrint('[TTS] Init error: $e');
+      // Thử fallback không có handler
+      try {
+        await _tts.setLanguage('en-US');
+        await _tts.setSpeechRate(0.75);
+        await _tts.setVolume(1.0);
+        await _tts.awaitSpeakCompletion(false);
+        _ttsReady = true;
+        if (mounted) setState(() {});
+      } catch (e2) {
+        debugPrint('[TTS] Fallback init error: $e2');
+        _ttsReady = false;
+      }
+    }
+  }
+
+  // ── FIX: Khởi tạo STT một lần duy nhất ─────────────────────────────────
+  Future<void> _initSpeech() async {
+    if (_sttInitialized) return;
+    try {
+      final available = await _speech.initialize(
         onStatus: (status) {
           debugPrint('[STT] Status: $status');
           if (!mounted) return;
+          // Các trạng thái kết thúc
           if (status == 'done' ||
               status == 'notListening' ||
               status == 'doneNoResult') {
-            setState(() => _isListening = false);
+            if (mounted && _isListening) {
+              setState(() => _isListening = false);
+            }
           }
         },
         onError: (error) {
           debugPrint('[STT] Error: ${error.errorMsg}');
           if (!mounted) return;
-          setState(() => _isListening = false);
-          // Chỉ hiện lỗi nếu không phải lỗi "no speech" bình thường
+          if (mounted) setState(() => _isListening = false);
+          // Bỏ qua lỗi timeout và no_match - chúng bình thường
           if (error.errorMsg != 'error_speech_timeout' &&
-              error.errorMsg != 'error_no_match') {
-            _showSnack('Lỗi nhận giọng nói: ${error.errorMsg}');
+              error.errorMsg != 'error_no_match' &&
+              error.errorMsg != 'error_busy') {
+            _showSnack('Lỗi mic: ${error.errorMsg}');
           }
         },
         debugLogging: false,
       );
-      debugPrint('[STT] Available: $_speechAvailable');
+
+      _sttInitialized = available;
+      _speechAvailable = available;
+      debugPrint('[STT] Initialized: $available');
       if (mounted) setState(() {});
     } catch (e) {
       debugPrint('[STT] Init error: $e');
+      _sttInitialized = false;
       _speechAvailable = false;
       if (mounted) setState(() {});
-    }
-  }
-
-  // ── FIX: Khởi tạo TTS - KHÔNG dùng awaitSpeakCompletion(true) vì nó block ──
-  Future<void> _initTts() async {
-    try {
-      // Set handlers TRƯỚC khi cấu hình bất cứ thứ gì
-      _tts.setStartHandler(() {
-        debugPrint('[TTS] Started');
-        if (mounted) setState(() => _isSpeaking = true);
-      });
-      _tts.setCompletionHandler(() {
-        debugPrint('[TTS] Completed');
-        if (mounted) setState(() => _isSpeaking = false);
-      });
-      _tts.setCancelHandler(() {
-        debugPrint('[TTS] Cancelled');
-        if (mounted) setState(() => _isSpeaking = false);
-      });
-      _tts.setErrorHandler((msg) {
-        debugPrint('[TTS] Error: $msg');
-        if (mounted) setState(() => _isSpeaking = false);
-      });
-
-      // Cấu hình sau khi set handlers
-      await _tts.setLanguage('en-US');
-      await _tts.setSpeechRate(0.8);
-      await _tts.setVolume(1.0);
-      await _tts.setPitch(1.0);
-
-      // KHÔNG dùng awaitSpeakCompletion(true) - nó chặn isolate và gây lỗi
-      // "not bound to TTS engine" trên Android
-      await _tts.awaitSpeakCompletion(false);
-
-      // Warm up engine: speak chuỗi rỗng để bind engine ngay từ đầu
-      await _tts.speak(' ');
-      await Future.delayed(const Duration(milliseconds: 300));
-      await _tts.stop();
-
-      _ttsReady = true;
-      debugPrint('[TTS] Ready and warmed up');
-      if (mounted) setState(() {});
-    } catch (e) {
-      debugPrint('[TTS] Init error: $e');
-      // Thử lại không warm-up
-      try {
-        await _tts.setLanguage('en-US');
-        await _tts.setSpeechRate(0.8);
-        await _tts.setVolume(1.0);
-        _ttsReady = true;
-        if (mounted) setState(() {});
-      } catch (_) {
-        _ttsReady = false;
-      }
     }
   }
 
@@ -322,12 +336,13 @@ class _ChatbotScreenState extends State<ChatbotScreen>
     _bgAnim.dispose();
     _aiTypingAnim.dispose();
     _micPulseAnim.dispose();
-    _speech.stop();
-    _tts.stop();
+    // Dừng STT và TTS an toàn
+    if (_isListening) _speech.stop();
+    if (_isSpeaking) _tts.stop();
     super.dispose();
   }
 
-  // ── Send message ──────────────────────────────────────────────────────────
+  // ── FIX: Send message - history management đúng ──────────────────────────
   Future<void> _sendMessage([String? override]) async {
     final text = (override ?? _inputCtrl.text).trim();
     if (text.isEmpty || _isLoading) return;
@@ -335,124 +350,110 @@ class _ChatbotScreenState extends State<ChatbotScreen>
     HapticFeedback.lightImpact();
     _inputCtrl.clear();
 
-    // Nếu đang nghe thì dừng
+    // Dừng mic nếu đang nghe
     if (_isListening) {
       await _speech.stop();
       setState(() => _isListening = false);
+      await Future.delayed(const Duration(milliseconds: 100));
     }
 
-    // Nếu đang nói thì dừng
+    // Dừng TTS nếu đang nói
     if (_isSpeaking) {
       await _tts.stop();
       setState(() => _isSpeaking = false);
+      await Future.delayed(const Duration(milliseconds: 100));
     }
 
     setState(() {
-      _messages.add(ChatMessage(
-        text: text,
-        isUser: true,
-        time: DateTime.now(),
-      ));
+      _messages.add(ChatMessage(text: text, isUser: true, time: DateTime.now()));
       _isLoading = true;
       _messages.add(ChatMessage(
-        text: '',
-        isUser: false,
-        time: DateTime.now(),
-        isLoading: true,
-      ));
+        text: '', isUser: false, time: DateTime.now(), isLoading: true));
     });
-
     _scrollToBottom();
 
-    // Thêm vào history (không include message hiện tại vì GeminiService thêm riêng)
-    _history.add({
-      'role': 'user',
-      'parts': [
-        {'text': text}
-      ]
-    });
-
     try {
-      final historyToSend = List<Map<String, dynamic>>.from(_history)
-        ..removeLast(); // bỏ message vừa thêm vì GeminiService sẽ tự thêm
-
+      // Gửi _history hiện tại (chỉ chứa các tin nhắn ĐÃ hoàn thành trước đó)
+      // GeminiService sẽ tự thêm userMessage vào cuối
       final response = await GeminiService.sendMessage(
-        history: historyToSend,
+        history: List<Map<String, dynamic>>.from(_history),
         userMessage: text,
         mode: _mode,
       );
 
-      _history.add({
-        'role': 'model',
-        'parts': [
-          {'text': response}
-        ]
-      });
+      // Lưu cặp user/model vào history SAU KHI nhận được response
+      _history.add({'role': 'user', 'parts': [{'text': text}]});
+      _history.add({'role': 'model', 'parts': [{'text': response}]});
 
+      if (mounted) {
+        setState(() {
+          _messages.removeLast(); // xóa loading bubble
+          _messages.add(ChatMessage(
+            text: response, isUser: false, time: DateTime.now()));
+          _isLoading = false;
+        });
+        _scrollToBottom();
+      }
+
+      // TTS: Đọc phần tiếng Anh trong response
+      if (_ttsEnabled && _ttsReady && mounted) {
+        final ttsText = _extractEnglishForTts(response);
+        if (ttsText.isNotEmpty) {
+          await Future.delayed(const Duration(milliseconds: 300));
+          await _speakSafe(ttsText);
+        }
+      }
+    } catch (e) {
+      debugPrint('[Chat] Error: $e');
       if (mounted) {
         setState(() {
           _messages.removeLast(); // xóa loading
           _messages.add(ChatMessage(
-            text: response,
+            text: '⚠️ Lỗi: ${e.toString().replaceAll('Exception: ', '')}',
             isUser: false,
             time: DateTime.now(),
           ));
           _isLoading = false;
         });
       }
-
-      // FIX: Tách text tiếng Anh để đọc TTS
-      if (_ttsEnabled && _ttsReady) {
-        final ttsText = _extractEnglishForTts(response);
-        if (ttsText.isNotEmpty) {
-          await _speakText(ttsText);
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _messages.removeLast();
-          _messages.add(ChatMessage(
-            text: '⚠️ Lỗi kết nối: ${e.toString().replaceAll('Exception: ', '')}',
-            isUser: false,
-            time: DateTime.now(),
-          ));
-          _isLoading = false;
-        });
-      }
-      // Xóa message lỗi khỏi history
-      if (_history.isNotEmpty) _history.removeLast();
     }
 
     _scrollToBottom();
   }
 
-  // Hàm tách text tiếng Anh để đọc TTS
+  // ── FIX: Tách text tiếng Anh để đọc TTS ────────────────────────────────
   String _extractEnglishForTts(String text) {
-    // FIX: Dart không hỗ trợ backreference r'\1' trong replaceAll
-    // Phải dùng replaceAllMapped để lấy capture group
+    // Xóa markdown formatting
     String clean = text
         .replaceAllMapped(RegExp(r'\*\*(.+?)\*\*'), (m) => m.group(1) ?? '')
         .replaceAllMapped(RegExp(r'\*(.+?)\*'), (m) => m.group(1) ?? '')
         .replaceAllMapped(RegExp(r'_(.+?)_'), (m) => m.group(1) ?? '');
 
-    // Tách các dòng chứa tiếng Anh
     final lines = clean.split('\n');
     final englishLines = <String>[];
 
     for (final line in lines) {
       final trimmed = line.trim();
-      if (trimmed.isEmpty) continue;
+      if (trimmed.isEmpty || trimmed.length < 4) continue;
 
-      // Lấy dòng có > 50% ký tự latin → là tiếng Anh
-      final latinChars = RegExp(r'[a-zA-Z]').allMatches(trimmed).length;
-      final totalChars = trimmed.length;
+      // Xóa prefix emoji/bullet
+      final stripped = trimmed
+          .replaceAll(RegExp(r'^[•\-\*📚🔤💡🔥🎤🧠💬→]+\s*'), '')
+          .trim();
+      if (stripped.isEmpty) continue;
 
-      if (totalChars > 0 && latinChars / totalChars > 0.5) {
-        // Xóa emoji/ký tự đặc biệt, giữ ASCII
-        final ttsLine = trimmed
+      // Đếm ký tự latin
+      final latinChars = RegExp(r'[a-zA-Z]').allMatches(stripped).length;
+      final total = stripped.length;
+      if (total == 0) continue;
+
+      final ratio = latinChars / total;
+      // Lấy dòng có > 45% ký tự latin (tiếng Anh)
+      if (ratio > 0.45) {
+        // Xóa ký tự non-ASCII (emoji, tiếng Việt...)
+        final ttsLine = stripped
             .replaceAll(RegExp(r'[^\x20-\x7E]'), ' ')
-            .replaceAll(RegExp(r'\s+'), ' ')
+            .replaceAll(RegExp(r'\s{2,}'), ' ')
             .trim();
         if (ttsLine.length > 3) {
           englishLines.add(ttsLine);
@@ -460,37 +461,56 @@ class _ChatbotScreenState extends State<ChatbotScreen>
       }
     }
 
-    // Giới hạn không đọc quá dài
+    // Lấy tối đa 3 dòng để không quá dài
     final result = englishLines.take(3).join('. ');
-    debugPrint('[TTS] Will speak: $result');
+    if (result.isNotEmpty) {
+      debugPrint('[TTS] Will speak: "$result"');
+    }
     return result;
   }
 
-  // FIX: Hàm speak với error handling
-  Future<void> _speakText(String text) async {
-    if (!_ttsReady || text.isEmpty) return;
+  // ── FIX: Speak với retry logic ───────────────────────────────────────────
+  Future<void> _speakSafe(String text) async {
+    if (!_ttsReady || text.isEmpty || !mounted) return;
+
     try {
+      // Dừng nếu đang nói
       if (_isSpeaking) {
         await _tts.stop();
         await Future.delayed(const Duration(milliseconds: 200));
       }
-      debugPrint('[TTS] Speaking: $text');
-      await _tts.speak(text);
+
+      debugPrint('[TTS] Speaking: "$text"');
+      final result = await _tts.speak(text);
+      debugPrint('[TTS] speak() result: $result');
     } catch (e) {
-      debugPrint('[TTS] Speak error: $e');
+      debugPrint('[TTS] speak error: $e');
       if (mounted) setState(() => _isSpeaking = false);
+
+      // Retry một lần
+      try {
+        await Future.delayed(const Duration(milliseconds: 500));
+        await _tts.speak(text);
+      } catch (e2) {
+        debugPrint('[TTS] retry error: $e2');
+        if (mounted) setState(() => _isSpeaking = false);
+      }
     }
   }
 
-  // FIX: Toggle microphone - reinit STT trước mỗi lần listen
+  // ── FIX: Toggle microphone - không reinit mỗi lần ──────────────────────
   Future<void> _toggleListening() async {
     HapticFeedback.mediumImpact();
 
+    // Nếu đang nghe → dừng và gửi
     if (_isListening) {
+      debugPrint('[STT] Stopping...');
       await _speech.stop();
       setState(() => _isListening = false);
-      if (_inputCtrl.text.trim().isNotEmpty) {
-        _sendMessage(_inputCtrl.text.trim());
+      await Future.delayed(const Duration(milliseconds: 150));
+      final pending = _inputCtrl.text.trim();
+      if (pending.isNotEmpty) {
+        _sendMessage(pending);
       }
       return;
     }
@@ -499,84 +519,73 @@ class _ChatbotScreenState extends State<ChatbotScreen>
     if (_isSpeaking) {
       await _tts.stop();
       setState(() => _isSpeaking = false);
-    }
-
-    // FIX: "bind to recognition service failed" xảy ra khi SpeechRecognizer
-    // bị Android unbind sau khi không dùng. Phải stop trước rồi reinit.
-    try {
-      await _speech.stop();
       await Future.delayed(const Duration(milliseconds: 100));
-    } catch (_) {}
-
-    // Reinit mỗi lần để tránh lỗi bind
-    bool available = false;
-    try {
-      available = await _speech.initialize(
-        onStatus: (status) {
-          debugPrint('[STT] Status: $status');
-          if (!mounted) return;
-          if (status == 'done' ||
-              status == 'notListening' ||
-              status == 'doneNoResult') {
-            if (mounted) setState(() => _isListening = false);
-          }
-        },
-        onError: (error) {
-          debugPrint('[STT] Error: ${error.errorMsg}');
-          if (!mounted) return;
-          setState(() => _isListening = false);
-          if (error.errorMsg != 'error_speech_timeout' &&
-              error.errorMsg != 'error_no_match') {
-            _showSnack('Lỗi mic: ${error.errorMsg}');
-          }
-        },
-        debugLogging: false,
-      );
-    } catch (e) {
-      debugPrint('[STT] Reinit error: $e');
     }
 
-    if (!available) {
-      _showSnack('Microphone không khả dụng. Vào Cài đặt → Quyền ứng dụng → Cấp quyền Microphone.');
+    // Kiểm tra/khởi tạo STT
+    if (!_sttInitialized) {
+      await _initSpeech();
+    }
+
+    if (!_speechAvailable) {
+      _showSnack('Microphone chưa được cấp quyền. Vào Cài đặt → Ứng dụng → Cấp quyền Micro.');
       return;
     }
 
-    setState(() {
-      _speechAvailable = true;
-      _isListening = true;
-      _inputCtrl.clear();
-    });
+    // FIX: Nếu STT đang bận, stop trước
+    if (_speech.isListening) {
+      await _speech.stop();
+      await Future.delayed(const Duration(milliseconds: 200));
+    }
+
+    _inputCtrl.clear();
+    setState(() => _isListening = true);
 
     try {
+      debugPrint('[STT] Starting listen...');
       await _speech.listen(
         onResult: (result) {
           if (!mounted) return;
-          debugPrint('[STT] "${result.recognizedWords}" final=${result.finalResult}');
+          debugPrint('[STT] Result: "${result.recognizedWords}" final=${result.finalResult}');
+
+          // Cập nhật text field theo thời gian thực
           setState(() => _inputCtrl.text = result.recognizedWords);
 
+          // Khi kết quả cuối cùng → gửi tự động
           if (result.finalResult && result.recognizedWords.trim().isNotEmpty) {
             setState(() => _isListening = false);
-            Future.delayed(const Duration(milliseconds: 200), () {
-              _sendMessage(result.recognizedWords.trim());
+            Future.delayed(const Duration(milliseconds: 300), () {
+              if (mounted) _sendMessage(result.recognizedWords.trim());
             });
           }
         },
         localeId: 'en_US',
         listenFor: const Duration(seconds: 30),
-        pauseFor: const Duration(seconds: 4),
+        pauseFor: const Duration(seconds: 3),
         partialResults: true,
         cancelOnError: false,
-        listenMode: stt.ListenMode.confirmation,
+        // FIX: Dùng dictation thay vì confirmation để nghe liên tục tốt hơn
+        listenMode: stt.ListenMode.dictation,
       );
+      debugPrint('[STT] listen() called successfully');
     } catch (e) {
-      debugPrint('[STT] Listen error: $e');
+      debugPrint('[STT] listen error: $e');
       setState(() => _isListening = false);
-      _showSnack('Không thể nhận giọng nói: $e');
+
+      // Thử reinit và listen lại
+      _sttInitialized = false;
+      _speechAvailable = false;
+      await _initSpeech();
+      if (_speechAvailable) {
+        _showSnack('Thử lại, nhấn mic lần nữa');
+      } else {
+        _showSnack('Không thể dùng mic: $e');
+      }
     }
   }
 
   void _scrollToBottom() {
-    Future.delayed(const Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 120), () {
       if (_scrollCtrl.hasClients) {
         _scrollCtrl.animateTo(
           _scrollCtrl.position.maxScrollExtent,
@@ -600,16 +609,11 @@ class _ChatbotScreenState extends State<ChatbotScreen>
       ChatMode.pronunciation: '🎤 Luyện phát âm',
       ChatMode.quiz: '🧠 Quiz kiểm tra',
     };
-
     final modeIntros = {
-      ChatMode.freeChat:
-          'Chế độ trò chuyện tự do! Viết hoặc nói bất kỳ điều gì bằng tiếng Anh. 💬',
-      ChatMode.vocabLearn:
-          'Chế độ học từ vựng! Gửi từ IT bạn muốn học (ví dụ: "microservice", "latency"). 📚',
-      ChatMode.pronunciation:
-          'Chế độ luyện phát âm! Gửi thuật ngữ bạn muốn học cách đọc (ví dụ: "SQL", "API"). 🎤',
-      ChatMode.quiz:
-          'Quiz IT English bắt đầu! Gõ "bắt đầu" để chơi! 🧠',
+      ChatMode.freeChat: 'Chế độ trò chuyện tự do! Viết hoặc nói bất kỳ điều gì bằng tiếng Anh. 💬',
+      ChatMode.vocabLearn: 'Chế độ học từ vựng! Gửi từ IT bạn muốn học (ví dụ: "microservice", "latency"). 📚',
+      ChatMode.pronunciation: 'Chế độ luyện phát âm! Gửi thuật ngữ bạn muốn học cách đọc (ví dụ: "SQL", "API"). 🎤',
+      ChatMode.quiz: 'Quiz IT English bắt đầu! Gõ "bắt đầu" để chơi! 🧠',
     };
 
     setState(() {
@@ -658,7 +662,6 @@ class _ChatbotScreenState extends State<ChatbotScreen>
           child: Column(children: [
             _buildHeader(),
             _buildModeSelector(),
-            // FIX: Hiển thị trạng thái STT/TTS
             if (_isListening) _buildListeningBanner(),
             Expanded(
               child: _messages.isEmpty
@@ -666,11 +669,9 @@ class _ChatbotScreenState extends State<ChatbotScreen>
                   : ListView.builder(
                       controller: _scrollCtrl,
                       physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       itemCount: _messages.length,
-                      itemBuilder: (_, i) =>
-                          _buildMessageBubble(_messages[i], i),
+                      itemBuilder: (_, i) => _buildMessageBubble(_messages[i], i),
                     ),
             ),
             _buildInputBar(bottomPad),
@@ -690,18 +691,15 @@ class _ChatbotScreenState extends State<ChatbotScreen>
         decoration: BoxDecoration(
           color: _activeColor.withOpacity(0.1 + _micPulseAnim.value * 0.05),
           borderRadius: BorderRadius.circular(12),
-          border:
-              Border.all(color: _activeColor.withOpacity(0.4), width: 1.5),
+          border: Border.all(color: _activeColor.withOpacity(0.4), width: 1.5),
         ),
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(Icons.mic_rounded, color: _activeColor, size: 16),
           const SizedBox(width: 8),
           Text(
-            'Đang nghe... Nhấn mic để dừng và gửi',
+            'Đang nghe... Nói xong nhấn mic để gửi',
             style: TextStyle(
-                color: _activeColor,
-                fontSize: 12,
-                fontWeight: FontWeight.w600),
+              color: _activeColor, fontSize: 12, fontWeight: FontWeight.w600),
           ),
         ]),
       ),
@@ -716,48 +714,37 @@ class _ChatbotScreenState extends State<ChatbotScreen>
         AnimatedBuilder(
           animation: _aiTypingAnim,
           builder: (_, __) {
-            final glowOp =
-                _isLoading ? (0.3 + _aiTypingAnim.value * 0.4) : 0.3;
+            final glowOp = _isLoading ? (0.3 + _aiTypingAnim.value * 0.4) : 0.3;
             return Stack(children: [
               Container(
-                width: 44,
-                height: 44,
+                width: 44, height: 44,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                        color: _activeColor.withOpacity(glowOp),
-                        blurRadius: 16,
-                        spreadRadius: 2)
-                  ],
+                  boxShadow: [BoxShadow(
+                    color: _activeColor.withOpacity(glowOp),
+                    blurRadius: 16, spreadRadius: 2)],
                 ),
               ),
               Container(
-                width: 44,
-                height: 44,
+                width: 44, height: 44,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [_activeColor, const Color(0xFF7B2FFF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    begin: Alignment.topLeft, end: Alignment.bottomRight,
                   ),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.smart_toy_rounded,
-                    color: Colors.white, size: 22),
+                child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 22),
               ),
               if (_isLoading)
                 Positioned(
-                  bottom: 0,
-                  right: 0,
+                  bottom: 0, right: 0,
                   child: Container(
-                    width: 12,
-                    height: 12,
+                    width: 12, height: 12,
                     decoration: BoxDecoration(
                       color: const Color(0xFF00FF94),
                       shape: BoxShape.circle,
-                      border: Border.all(
-                          color: const Color(0xFF080B1A), width: 2),
+                      border: Border.all(color: const Color(0xFF080B1A), width: 2),
                     ),
                   ),
                 ),
@@ -768,36 +755,28 @@ class _ChatbotScreenState extends State<ChatbotScreen>
         const SizedBox(width: 12),
 
         Expanded(
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('DevTalk AI',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.3)),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  child: Text(
-                    _isLoading
-                        ? 'Đang suy nghĩ...'
-                        : _isListening
-                            ? '🎤 Đang nghe...'
-                            : _isSpeaking
-                                ? '🔊 Đang phát âm...'
-                                : 'Powered by Gemini',
-                    key: ValueKey('$_isLoading$_isListening$_isSpeaking'),
-                    style: TextStyle(
-                        color: _activeColor.withOpacity(0.8),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500),
-                  ),
-                ),
-              ]),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('DevTalk AI',
+              style: TextStyle(
+                color: Colors.white, fontSize: 17,
+                fontWeight: FontWeight.w800, letterSpacing: -0.3)),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Text(
+                _isLoading ? 'Đang suy nghĩ...'
+                    : _isListening ? '🎤 Đang nghe...'
+                    : _isSpeaking ? '🔊 Đang phát âm...'
+                    : 'Powered by Gemini',
+                key: ValueKey('$_isLoading$_isListening$_isSpeaking'),
+                style: TextStyle(
+                  color: _activeColor.withOpacity(0.8),
+                  fontSize: 12, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ]),
         ),
 
-        // TTS toggle với indicator trạng thái
+        // TTS toggle
         GestureDetector(
           onTap: () async {
             HapticFeedback.lightImpact();
@@ -809,25 +788,20 @@ class _ChatbotScreenState extends State<ChatbotScreen>
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            width: 38,
-            height: 38,
+            width: 38, height: 38,
             decoration: BoxDecoration(
               color: _ttsEnabled
                   ? _activeColor.withOpacity(0.15)
                   : Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  color: _ttsEnabled
-                      ? _activeColor.withOpacity(0.4)
-                      : Colors.white.withOpacity(0.1)),
+                color: _ttsEnabled
+                    ? _activeColor.withOpacity(0.4)
+                    : Colors.white.withOpacity(0.1)),
             ),
             child: Stack(alignment: Alignment.center, children: [
               Icon(
-                _isSpeaking
-                    ? Icons.volume_up_rounded
-                    : _ttsEnabled
-                        ? Icons.volume_up_rounded
-                        : Icons.volume_off_rounded,
+                _ttsEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded,
                 color: _isSpeaking
                     ? _activeColor
                     : _ttsEnabled
@@ -835,18 +809,13 @@ class _ChatbotScreenState extends State<ChatbotScreen>
                         : Colors.white.withOpacity(0.3),
                 size: 18,
               ),
-              // Dot indicator khi đang nói
               if (_isSpeaking)
                 Positioned(
-                  top: 4,
-                  right: 4,
+                  top: 4, right: 4,
                   child: Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF00FF94),
-                      shape: BoxShape.circle,
-                    ),
+                    width: 6, height: 6,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF00FF94), shape: BoxShape.circle),
                   ),
                 ),
             ]),
@@ -866,16 +835,14 @@ class _ChatbotScreenState extends State<ChatbotScreen>
             _addWelcomeMessage();
           },
           child: Container(
-            width: 38,
-            height: 38,
+            width: 38, height: 38,
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(10),
-              border:
-                  Border.all(color: Colors.white.withOpacity(0.1)),
+              border: Border.all(color: Colors.white.withOpacity(0.1)),
             ),
             child: Icon(Icons.refresh_rounded,
-                color: Colors.white.withOpacity(0.5), size: 18),
+              color: Colors.white.withOpacity(0.5), size: 18),
           ),
         ),
       ]),
@@ -895,52 +862,44 @@ class _ChatbotScreenState extends State<ChatbotScreen>
       height: 44,
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
       child: Row(
-          children: modes.map((m) {
-        final isActive = _mode == m.$1;
-        final color = _modeColors[m.$1]!;
-        return Expanded(
+        children: modes.map((m) {
+          final isActive = _mode == m.$1;
+          final color = _modeColors[m.$1]!;
+          return Expanded(
             child: GestureDetector(
-          onTap: () => _changeMode(m.$1),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            margin: const EdgeInsets.symmetric(horizontal: 3),
-            decoration: BoxDecoration(
-              color: isActive
-                  ? color.withOpacity(0.18)
-                  : Colors.white.withOpacity(0.04),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
+              onTap: () => _changeMode(m.$1),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                decoration: BoxDecoration(
                   color: isActive
-                      ? color.withOpacity(0.5)
-                      : Colors.white.withOpacity(0.08)),
-              boxShadow: isActive
-                  ? [
-                      BoxShadow(
-                          color: color.withOpacity(0.2),
-                          blurRadius: 8)
-                    ]
-                  : null,
-            ),
-            child: Center(
-                child: Row(
+                      ? color.withOpacity(0.18)
+                      : Colors.white.withOpacity(0.04),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isActive
+                        ? color.withOpacity(0.5)
+                        : Colors.white.withOpacity(0.08)),
+                  boxShadow: isActive
+                      ? [BoxShadow(color: color.withOpacity(0.2), blurRadius: 8)]
+                      : null,
+                ),
+                child: Center(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                  Text(m.$2, style: const TextStyle(fontSize: 14)),
-                  const SizedBox(width: 4),
-                  Text(m.$3,
-                      style: TextStyle(
-                        color: isActive
-                            ? color
-                            : Colors.white.withOpacity(0.4),
-                        fontSize: 11,
-                        fontWeight: isActive
-                            ? FontWeight.w700
-                            : FontWeight.w400,
-                      )),
-                ])),
-          ),
-        ));
-      }).toList()),
+                      Text(m.$2, style: const TextStyle(fontSize: 14)),
+                      const SizedBox(width: 4),
+                      Text(m.$3,
+                        style: TextStyle(
+                          color: isActive ? color : Colors.white.withOpacity(0.4),
+                          fontSize: 11,
+                          fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
+                        )),
+                    ])),
+              ),
+            ));
+        }).toList()),
     );
   }
 
@@ -961,146 +920,115 @@ class _ChatbotScreenState extends State<ChatbotScreen>
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 4),
         child: Row(
-          mainAxisAlignment:
-              isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             if (!isUser) ...[
               Container(
-                width: 30,
-                height: 30,
+                width: 30, height: 30,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                      colors: [_activeColor, const Color(0xFF7B2FFF)]),
+                    colors: [_activeColor, const Color(0xFF7B2FFF)]),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.smart_toy_rounded,
-                    color: Colors.white, size: 16),
+                child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 16),
               ),
               const SizedBox(width: 8),
             ],
             Flexible(
               child: GestureDetector(
-                // FIX: Long press để đọc to bất kỳ tin nhắn AI nào
-                onLongPress: !isUser
-                    ? () {
-                        HapticFeedback.mediumImpact();
-                        final ttsText = _extractEnglishForTts(msg.text);
-                        if (ttsText.isNotEmpty) {
-                          _speakText(ttsText);
-                        } else {
-                          _showSnack(
-                              'Không tìm thấy nội dung tiếng Anh để đọc');
-                        }
-                      }
-                    : null,
+                onLongPress: !isUser ? () {
+                  HapticFeedback.mediumImpact();
+                  final ttsText = _extractEnglishForTts(msg.text);
+                  if (ttsText.isNotEmpty) {
+                    _speakSafe(ttsText);
+                  } else {
+                    _showSnack('Không tìm thấy nội dung tiếng Anh để đọc');
+                  }
+                } : null,
                 child: Container(
                   constraints: BoxConstraints(
-                      maxWidth:
-                          MediaQuery.of(context).size.width * 0.75),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 10),
+                    maxWidth: MediaQuery.of(context).size.width * 0.75),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    gradient: isUser
-                        ? LinearGradient(
-                            colors: [
-                              _activeColor,
-                              _activeColor.withOpacity(0.7)
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          )
-                        : null,
+                    gradient: isUser ? LinearGradient(
+                      colors: [_activeColor, _activeColor.withOpacity(0.7)],
+                      begin: Alignment.topLeft, end: Alignment.bottomRight,
+                    ) : null,
                     color: isUser ? null : const Color(0xFF131830),
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(18),
                       topRight: const Radius.circular(18),
-                      bottomLeft:
-                          Radius.circular(isUser ? 18 : 4),
-                      bottomRight:
-                          Radius.circular(isUser ? 4 : 18),
+                      bottomLeft: Radius.circular(isUser ? 18 : 4),
+                      bottomRight: Radius.circular(isUser ? 4 : 18),
                     ),
-                    border: isUser
-                        ? null
-                        : Border.all(
-                            color: _activeColor.withOpacity(0.15)),
+                    border: isUser ? null : Border.all(
+                      color: _activeColor.withOpacity(0.15)),
                     boxShadow: [
                       BoxShadow(
                         color: isUser
                             ? _activeColor.withOpacity(0.25)
                             : Colors.black.withOpacity(0.3),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                        blurRadius: 12, offset: const Offset(0, 4),
                       ),
                     ],
                   ),
                   child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildFormattedText(msg.text, isUser),
-                        const SizedBox(height: 4),
-                        Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                '${msg.time.hour.toString().padLeft(2, '0')}:${msg.time.minute.toString().padLeft(2, '0')}',
-                                style: TextStyle(
-                                  color: isUser
-                                      ? Colors.white.withOpacity(0.7)
-                                      : Colors.white.withOpacity(0.4),
-                                  fontSize: 10,
-                                ),
-                              ),
-                              // FIX: Nút đọc to rõ ràng cho tin AI
-                              if (!isUser) ...[
-                                const SizedBox(width: 8),
-                                GestureDetector(
-                                  onTap: () {
-                                    HapticFeedback.lightImpact();
-                                    if (_isSpeaking) {
-                                      _tts.stop();
-                                      setState(
-                                          () => _isSpeaking = false);
-                                    } else {
-                                      final ttsText =
-                                          _extractEnglishForTts(
-                                              msg.text);
-                                      if (ttsText.isNotEmpty) {
-                                        _speakText(ttsText);
-                                      }
-                                    }
-                                  },
-                                  child: AnimatedBuilder(
-                                    animation: _aiTypingAnim,
-                                    builder: (_, __) => Icon(
-                                      _isSpeaking
-                                          ? Icons.stop_circle_rounded
-                                          : Icons.volume_up_rounded,
-                                      size: 14,
-                                      color: _isSpeaking
-                                          ? const Color(0xFF00FF94)
-                                          : _activeColor
-                                              .withOpacity(0.7),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ]),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildFormattedText(msg.text, isUser),
+                      const SizedBox(height: 4),
+                      Row(mainAxisSize: MainAxisSize.min, children: [
+                        Text(
+                          '${msg.time.hour.toString().padLeft(2, '0')}:${msg.time.minute.toString().padLeft(2, '0')}',
+                          style: TextStyle(
+                            color: isUser
+                                ? Colors.white.withOpacity(0.7)
+                                : Colors.white.withOpacity(0.4),
+                            fontSize: 10,
+                          ),
+                        ),
+                        // Nút đọc to cho tin AI
+                        if (!isUser) ...[
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () async {
+                              HapticFeedback.lightImpact();
+                              if (_isSpeaking) {
+                                await _tts.stop();
+                                setState(() => _isSpeaking = false);
+                              } else {
+                                final ttsText = _extractEnglishForTts(msg.text);
+                                if (ttsText.isNotEmpty) {
+                                  await _speakSafe(ttsText);
+                                } else {
+                                  _showSnack('Không có nội dung tiếng Anh để đọc');
+                                }
+                              }
+                            },
+                            child: Icon(
+                              _isSpeaking ? Icons.stop_circle_rounded : Icons.volume_up_rounded,
+                              size: 14,
+                              color: _isSpeaking
+                                  ? const Color(0xFF00FF94)
+                                  : _activeColor.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
                       ]),
+                    ]),
                 ),
               ),
             ),
             if (isUser) ...[
               const SizedBox(width: 8),
               Container(
-                width: 30,
-                height: 30,
+                width: 30, height: 30,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.person_rounded,
-                    color: Colors.white54, size: 16),
+                child: const Icon(Icons.person_rounded, color: Colors.white54, size: 16),
               ),
             ],
           ],
@@ -1123,12 +1051,8 @@ class _ChatbotScreenState extends State<ChatbotScreen>
           spans.add(TextSpan(
             text: parts[j],
             style: TextStyle(
-              color: isUser
-                  ? Colors.white
-                  : Colors.white.withOpacity(0.9),
-              fontWeight: j % 2 == 1
-                  ? FontWeight.w800
-                  : FontWeight.w400,
+              color: isUser ? Colors.white : Colors.white.withOpacity(0.9),
+              fontWeight: j % 2 == 1 ? FontWeight.w800 : FontWeight.w400,
               fontSize: 14.5,
               height: 1.5,
             ),
@@ -1138,9 +1062,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
         spans.add(TextSpan(
           text: line,
           style: TextStyle(
-            color: isUser
-                ? Colors.white
-                : Colors.white.withOpacity(0.88),
+            color: isUser ? Colors.white : Colors.white.withOpacity(0.88),
             fontSize: 14.5,
             height: 1.5,
           ),
@@ -1155,23 +1077,19 @@ class _ChatbotScreenState extends State<ChatbotScreen>
   Widget _buildTypingIndicator() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child:
-          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+      child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         Container(
-          width: 30,
-          height: 30,
+          width: 30, height: 30,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-                colors: [_activeColor, const Color(0xFF7B2FFF)]),
+              colors: [_activeColor, const Color(0xFF7B2FFF)]),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.smart_toy_rounded,
-              color: Colors.white, size: 16),
+          child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 16),
         ),
         const SizedBox(width: 8),
         Container(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: const Color(0xFF131830),
             borderRadius: const BorderRadius.only(
@@ -1180,38 +1098,30 @@ class _ChatbotScreenState extends State<ChatbotScreen>
               bottomLeft: Radius.circular(4),
               bottomRight: Radius.circular(18),
             ),
-            border: Border.all(
-                color: _activeColor.withOpacity(0.15)),
+            border: Border.all(color: _activeColor.withOpacity(0.15)),
           ),
           child: AnimatedBuilder(
             animation: _aiTypingAnim,
             builder: (_, __) => Row(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(3, (i) {
-                  final phase =
-                      (_aiTypingAnim.value + i * 0.33) % 1.0;
-                  final v = math.sin(phase * math.pi);
-                  return Transform.translate(
-                    offset: Offset(0, -v * 4),
-                    child: Container(
-                      width: 7,
-                      height: 7,
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 2),
-                      decoration: BoxDecoration(
-                        color: _activeColor
-                            .withOpacity(0.4 + v * 0.5),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                              color: _activeColor
-                                  .withOpacity(v * 0.4),
-                              blurRadius: 6)
-                        ],
-                      ),
+              mainAxisSize: MainAxisSize.min,
+              children: List.generate(3, (i) {
+                final phase = (_aiTypingAnim.value + i * 0.33) % 1.0;
+                final v = math.sin(phase * math.pi);
+                return Transform.translate(
+                  offset: Offset(0, -v * 4),
+                  child: Container(
+                    width: 7, height: 7,
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    decoration: BoxDecoration(
+                      color: _activeColor.withOpacity(0.4 + v * 0.5),
+                      shape: BoxShape.circle,
+                      boxShadow: [BoxShadow(
+                        color: _activeColor.withOpacity(v * 0.4),
+                        blurRadius: 6)],
                     ),
-                  );
-                })),
+                  ),
+                );
+              })),
           ),
         ),
       ]),
@@ -1221,61 +1131,45 @@ class _ChatbotScreenState extends State<ChatbotScreen>
   // ── Empty state ───────────────────────────────────────────────────────────
   Widget _buildEmptyState() {
     return Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-      AnimatedBuilder(
-        animation: _bgAnim,
-        builder: (_, __) => Transform.translate(
-          offset: Offset(
-              0, math.sin(_bgAnim.value * math.pi * 2) * 6),
-          child: Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        AnimatedBuilder(
+          animation: _bgAnim,
+          builder: (_, __) => Transform.translate(
+            offset: Offset(0, math.sin(_bgAnim.value * math.pi * 2) * 6),
+            child: Container(
+              width: 80, height: 80,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
                   colors: [_activeColor, const Color(0xFF7B2FFF)]),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                    color: _activeColor.withOpacity(0.35),
-                    blurRadius: 28)
-              ],
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(
+                  color: _activeColor.withOpacity(0.35), blurRadius: 28)],
+              ),
+              child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 36),
             ),
-            child: const Icon(Icons.smart_toy_rounded,
-                color: Colors.white, size: 36),
           ),
         ),
-      ),
-      const SizedBox(height: 20),
-      Text('Bắt đầu cuộc trò chuyện!',
-          style: TextStyle(
-              color: Colors.white.withOpacity(0.6), fontSize: 16)),
-    ]));
+        const SizedBox(height: 20),
+        Text('Bắt đầu cuộc trò chuyện!',
+          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 16)),
+      ]),
+    );
   }
 
   // ── Input bar ─────────────────────────────────────────────────────────────
   Widget _buildInputBar(double bottomPad) {
     return Container(
       padding: EdgeInsets.fromLTRB(
-          12,
-          8,
-          12,
-          12 +
-              bottomPad +
-              MediaQuery.of(context).padding.bottom),
+        12, 8, 12,
+        12 + bottomPad + MediaQuery.of(context).padding.bottom),
       decoration: BoxDecoration(
         color: const Color(0xFF0A0E22).withOpacity(0.95),
-        border: Border(
-            top: BorderSide(
-                color: Colors.white.withOpacity(0.06))),
-        boxShadow: [
-          BoxShadow(
-              color: _activeColor.withOpacity(0.08),
-              blurRadius: 20,
-              offset: const Offset(0, -4))
-        ],
+        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.06))),
+        boxShadow: [BoxShadow(
+          color: _activeColor.withOpacity(0.08),
+          blurRadius: 20, offset: const Offset(0, -4))],
       ),
       child: Row(children: [
-        // FIX: Mic button với trạng thái rõ ràng hơn
         _MicButton(
           isListening: _isListening,
           isAvailable: _speechAvailable,
@@ -1301,21 +1195,17 @@ class _ChatbotScreenState extends State<ChatbotScreen>
             ),
             child: TextField(
               controller: _inputCtrl,
-              style: const TextStyle(
-                  color: Colors.white, fontSize: 15, height: 1.4),
+              style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.4),
               maxLines: null,
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => _sendMessage(),
               decoration: InputDecoration(
-                hintText: _isListening
-                    ? '🎤 Đang nghe...'
-                    : 'Nhập hoặc nói...',
+                hintText: _isListening ? '🎤 Đang nghe...' : 'Nhập hoặc nói...',
                 hintStyle: TextStyle(
-                    color: Colors.white.withOpacity(0.3),
-                    fontSize: 14),
+                  color: Colors.white.withOpacity(0.3), fontSize: 14),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 10),
+                  horizontal: 16, vertical: 10),
               ),
               cursorColor: _activeColor,
             ),
@@ -1371,15 +1261,13 @@ class _MicButtonState extends State<_MicButton> {
       child: AnimatedBuilder(
         animation: widget.pulseAnim,
         builder: (_, __) {
-          final pulse =
-              widget.isListening ? widget.pulseAnim.value : 0.0;
+          final pulse = widget.isListening ? widget.pulseAnim.value : 0.0;
           return Stack(alignment: Alignment.center, children: [
             if (widget.isListening)
               Transform.scale(
                 scale: 1.0 + pulse * 0.5,
                 child: Container(
-                  width: 46,
-                  height: 46,
+                  width: 46, height: 46,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: widget.color.withOpacity((1 - pulse) * 0.25),
@@ -1388,18 +1276,14 @@ class _MicButtonState extends State<_MicButton> {
               ),
             AnimatedContainer(
               duration: const Duration(milliseconds: 150),
-              width: 44,
-              height: 44,
-              transform: Matrix4.identity()
-                ..scale(_pressed ? 0.92 : 1.0),
+              width: 44, height: 44,
+              transform: Matrix4.identity()..scale(_pressed ? 0.92 : 1.0),
               transformAlignment: Alignment.center,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: widget.isListening
                     ? LinearGradient(colors: [
-                        widget.color,
-                        widget.color.withOpacity(0.7)
-                      ])
+                        widget.color, widget.color.withOpacity(0.7)])
                     : null,
                 color: widget.isListening
                     ? null
@@ -1415,11 +1299,8 @@ class _MicButtonState extends State<_MicButton> {
                   width: 1.5,
                 ),
                 boxShadow: widget.isListening
-                    ? [
-                        BoxShadow(
-                            color: widget.color.withOpacity(0.4),
-                            blurRadius: 16)
-                      ]
+                    ? [BoxShadow(
+                        color: widget.color.withOpacity(0.4), blurRadius: 16)]
                     : null,
               ),
               child: Icon(
@@ -1451,10 +1332,11 @@ class _SendButton extends StatefulWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const _SendButton(
-      {required this.isLoading,
-      required this.color,
-      required this.onTap});
+  const _SendButton({
+    required this.isLoading,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   State<_SendButton> createState() => _SendButtonState();
@@ -1469,9 +1351,7 @@ class _SendButtonState extends State<_SendButton>
   void initState() {
     super.initState();
     _spinCtrl = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 800))
-      ..repeat();
+      vsync: this, duration: const Duration(milliseconds: 800))..repeat();
   }
 
   @override
@@ -1491,23 +1371,18 @@ class _SendButtonState extends State<_SendButton>
       onTapCancel: () => setState(() => _pressed = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 120),
-        width: 44,
-        height: 44,
+        width: 44, height: 44,
         transform: Matrix4.identity()..scale(_pressed ? 0.9 : 1.0),
         transformAlignment: Alignment.center,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           gradient: LinearGradient(
             colors: [widget.color, widget.color.withOpacity(0.7)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topLeft, end: Alignment.bottomRight,
           ),
-          boxShadow: [
-            BoxShadow(
-                color: widget.color.withOpacity(0.35),
-                blurRadius: 12,
-                offset: const Offset(0, 4))
-          ],
+          boxShadow: [BoxShadow(
+            color: widget.color.withOpacity(0.35),
+            blurRadius: 12, offset: const Offset(0, 4))],
         ),
         child: widget.isLoading
             ? AnimatedBuilder(
@@ -1520,8 +1395,7 @@ class _SendButtonState extends State<_SendButton>
                   ),
                 ),
               )
-            : const Icon(Icons.send_rounded,
-                color: Colors.white, size: 20),
+            : const Icon(Icons.send_rounded, color: Colors.white, size: 20),
       ),
     );
   }
@@ -1530,13 +1404,12 @@ class _SendButtonState extends State<_SendButton>
 class _MiniSpinPainter extends CustomPainter {
   final Color color;
   _MiniSpinPainter(this.color);
+
   @override
   void paint(Canvas canvas, Size size) {
     canvas.drawArc(
       Rect.fromLTWH(2, 2, size.width - 4, size.height - 4),
-      0,
-      math.pi * 1.5,
-      false,
+      0, math.pi * 1.5, false,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2
@@ -1569,20 +1442,19 @@ class _ChatBgPainter extends CustomPainter {
           math.sin(t * math.pi * 2 * (o[4] as double)) * 0.08;
       final y = (o[1] as double) +
           math.cos(t * math.pi * 2 * (o[4] as double)) * 0.06;
-      p.shader = RadialGradient(colors: [
-        (o[3] as Color).withOpacity(0.12),
-        Colors.transparent
-      ]).createShader(Rect.fromCircle(
-          center: Offset(x * size.width, y * size.height),
-          radius: (o[2] as double) * size.width));
-      canvas.drawCircle(Offset(x * size.width, y * size.height),
-          (o[2] as double) * size.width, p);
+      p.shader = RadialGradient(
+        colors: [(o[3] as Color).withOpacity(0.12), Colors.transparent],
+      ).createShader(Rect.fromCircle(
+        center: Offset(x * size.width, y * size.height),
+        radius: (o[2] as double) * size.width));
+      canvas.drawCircle(
+        Offset(x * size.width, y * size.height),
+        (o[2] as double) * size.width, p);
     }
   }
 
   @override
-  bool shouldRepaint(_ChatBgPainter o) =>
-      o.t != t || o.accent != accent;
+  bool shouldRepaint(_ChatBgPainter o) => o.t != t || o.accent != accent;
 }
 
 class _GridPainter extends CustomPainter {
