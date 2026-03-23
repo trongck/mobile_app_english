@@ -231,9 +231,12 @@ class _IntroScreenState extends State<IntroScreen>
                   ),
                 ),
 
+
+                const SizedBox(height: 150),
                 // PageView
                 Expanded(
                   child: PageView.builder(
+                  
                     controller: _pageController,
                     itemCount: intros.length,
                     onPageChanged: (i) => _onPageChanged(i, intros.length),
@@ -251,6 +254,7 @@ class _IntroScreenState extends State<IntroScreen>
                               horizontal: 32,
                               vertical: 16,
                             ),
+                            
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -270,9 +274,10 @@ class _IntroScreenState extends State<IntroScreen>
                                       child: child,
                                     );
                                   },
+                                  
                                   child: Container(
                                     width: 520,
-                                    height: 520,
+                                    height: 300,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(28),
                                       color: Colors.white,

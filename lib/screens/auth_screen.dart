@@ -162,14 +162,18 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   // Logo
                   Row(children: [
                     Container(width: 44, height: 44,
-                      decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF00D4FF), Color(0xFF7B2FFF)]), borderRadius: BorderRadius.circular(12),
+                      decoration: BoxDecoration(gradient: const LinearGradient(colors: [Color(0xFF00D4FF), Color.fromARGB(255, 58, 183, 199)]), borderRadius: BorderRadius.circular(12),
                         boxShadow: [BoxShadow(color: const Color(0xFF00D4FF).withOpacity(0.4), blurRadius: 16)]),
-                      child: const Center(child: Text('DT', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)))),
+                      child:  Center(child: Image.asset(
+                          'assets/icon/logo.png', // đường dẫn ảnh của bạn
+                          width: 35, height: 35,
+                          fit: BoxFit.fill,
+                        ),)),
                     const SizedBox(width: 12),
                     const Text('DevTalk English', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
                   ]),
                   const SizedBox(height: 44),
-                  Text(_isLogin ? 'Chào mừng\ntrở lại 👋' : 'Tạo tài khoản\ncủa bạn ✨',
+                  Text(_isLogin ? 'Chào mừng\ntrở lại!' : 'Tạo tài khoản\ncủa bạn ',
                     style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -1, height: 1.2)),
                   const SizedBox(height: 8),
                   Text(_isLogin ? 'Tiếp tục hành trình học tiếng Anh IT' : 'Chinh phục tiếng Anh IT ngay hôm nay',
@@ -179,8 +183,13 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                   if (!_showEmailForm) ...[
                     _SocialBtn(
                       child: Row(children: [
-                        Container(width: 28, height: 28, decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                          child: const Center(child: Text('G', style: TextStyle(color: Color(0xFFEA4335), fontWeight: FontWeight.w900, fontSize: 15)))),
+                        Container(width: 28, height: 28, decoration: const BoxDecoration(color: Color.fromARGB(255, 255, 255, 255), shape: BoxShape.circle),
+                          child:  Center(child:Center(child: Image.asset(
+                          'assets/icon/logo_gg.jpg', // đường dẫn ảnh của bạn
+                       
+                          width: 20, height: 20,
+                          fit: BoxFit.fill,
+                        ),))),
                         const SizedBox(width: 16),
                         Text(_isLogin ? 'Tiếp tục với Google' : 'Đăng ký với Google',
                           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
