@@ -559,3 +559,97 @@ class NhatKy {
       'NhatKy(maNK: $maNK, maND: $maND, ngayHoc: $ngayHoc, tgHoc: $tgHoc phút)';
 }
 
+class XacThucEmail {
+  final String email;
+  final String maOTP;
+  final String thoiGianHetHan; // Lưu dạng ISO8601 string
+
+  XacThucEmail({
+    required this.email,
+    required this.maOTP,
+    required this.thoiGianHetHan,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Email': email,
+      'MaOTP': maOTP,
+      'ThoiGianHetHan': thoiGianHetHan,
+    };
+  }
+
+  factory XacThucEmail.fromMap(Map<String, dynamic> map) {
+    return XacThucEmail(
+      email: map['Email'] as String,
+      maOTP: map['MaOTP'] as String,
+      thoiGianHetHan: map['ThoiGianHetHan'] as String,
+    );
+  }
+
+  XacThucEmail copyWith({
+    String? email,
+    String? maOTP,
+    String? thoiGianHetHan,
+  }) {
+    return XacThucEmail(
+      email: email ?? this.email,
+      maOTP: maOTP ?? this.maOTP,
+      thoiGianHetHan: thoiGianHetHan ?? this.thoiGianHetHan,
+    );
+  }
+
+  @override
+  String toString() =>
+      'XacThucEmail(email: $email, maOTP: $maOTP, thoiGianHetHan: $thoiGianHetHan)';
+}
+
+
+class NguoiDungTuVung {
+  final int maND;
+  final int maTu;
+  final bool daHoc;
+  final bool yeuThich;
+
+  NguoiDungTuVung({
+    required this.maND,
+    required this.maTu,
+    this.daHoc = false,
+    this.yeuThich = false,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'MaND': maND,
+      'MaTu': maTu,
+      'DaHoc': daHoc ? 1 : 0,
+      'YeuThich': yeuThich ? 1 : 0,
+    };
+  }
+
+  factory NguoiDungTuVung.fromMap(Map<String, dynamic> map) {
+    return NguoiDungTuVung(
+      maND: map['MaND'] as int,
+      maTu: map['MaTu'] as int,
+      daHoc: (map['DaHoc'] as int? ?? 0) == 1,
+      yeuThich: (map['YeuThich'] as int? ?? 0) == 1,
+    );
+  }
+
+  NguoiDungTuVung copyWith({
+    int? maND,
+    int? maTu,
+    bool? daHoc,
+    bool? yeuThich,
+  }) {
+    return NguoiDungTuVung(
+      maND: maND ?? this.maND,
+      maTu: maTu ?? this.maTu,
+      daHoc: daHoc ?? this.daHoc,
+      yeuThich: yeuThich ?? this.yeuThich,
+    );
+  }
+
+  @override
+  String toString() =>
+      'NguoiDungTuVung(maND: $maND, maTu: $maTu, daHoc: $daHoc, yeuThich: $yeuThich)';
+}

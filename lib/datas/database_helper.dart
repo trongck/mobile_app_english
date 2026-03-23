@@ -57,6 +57,27 @@ class DatabaseHelper {
     ''');
  
     await db.execute('''
+      CREATE TABLE XacThucEmail (
+        Email           TEXT PRIMARY KEY,
+        MaOTP           TEXT NOT NULL,
+        ThoiGianHetHan  TEXT NOT NULL
+      )
+    ''');
+
+    // Bảng trung gian lưu trạng thái từ vựng cá nhân hóa cho từng Người dùng
+    await db.execute('''
+      CREATE TABLE NguoiDung_TuVung (
+        MaND      INTEGER NOT NULL,
+        MaTu      INTEGER NOT NULL,
+        DaHoc     INTEGER NOT NULL DEFAULT 0,
+        YeuThich  INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (MaND, MaTu),
+        FOREIGN KEY (MaND) REFERENCES NguoiDung(MaND) ON DELETE CASCADE,
+        FOREIGN KEY (MaTu) REFERENCES TuVung(MaTu) ON DELETE CASCADE
+      )
+    ''');
+
+    await db.execute('''
       CREATE TABLE CDTuVung (
         MaCD   INTEGER PRIMARY KEY AUTOINCREMENT,
         TenCD  TEXT    NOT NULL
@@ -75,7 +96,6 @@ class DatabaseHelper {
         VdVI      TEXT,
         TuLoai    TEXT,
         MaCD      INTEGER,
-        YeuThich  INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (MaCD) REFERENCES CDTuVung(MaCD)
       )
     ''');
