@@ -1,0 +1,1124 @@
+[
+  {
+    "TieuDe": "Test 1: Cloud & Infrastructure",
+    "TgLamPhut": 30,
+    "TongDiem": 100,
+    "CauHoi": [
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which service model allows users to rent virtualized hardware?",
+        "LuaChon": "[{\"A\":\"SaaS\"},{\"B\":\"PaaS\"},{\"C\":\"IaaS\"},{\"D\":\"BaaS\"}]",
+        "DapAn": "C",
+        "GiaiThich": "IaaS cung cấp hạ tầng ảo hóa.",
+        "TrongSo": 1,
+        "ThuTu": 1
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "True or False: AWS is a product developed by Google.",
+        "LuaChon": "[{\"True\":\"Đúng\"},{\"False\":\"Sai\"}]",
+        "DapAn": "False",
+        "GiaiThich": "AWS thuộc Amazon.",
+        "TrongSo": 1,
+        "ThuTu": 2
+      },
+      {
+        "Loai": "DienKhuyet",
+        "NoiDung": "AWS là nền tảng điện toán đám mây được phát triển bởi tập đoàn nào?",
+        "LuaChon": "[]",
+        "DapAn": "Amazon",
+        "GiaiThich": "AWS (Amazon Web Services) thuộc sở hữu của Amazon, không phải Google.",
+        "TrongSo": 1,
+        "ThuTu": 3
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which cloud deployment model is accessible to the public?",
+        "LuaChon": "[{\"A\":\"Private Cloud\"},{\"B\":\"Public Cloud\"},{\"C\":\"Hybrid Cloud\"},{\"D\":\"Community Cloud\"}]",
+        "DapAn": "B",
+        "GiaiThich": "Public Cloud dùng cho mọi người.",
+        "TrongSo": 1,
+        "ThuTu": 4
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which company provides Azure?",
+        "LuaChon": "[{\"A\":\"Amazon\"},{\"B\":\"Microsoft\"},{\"C\":\"Google\"},{\"D\":\"IBM\"}]",
+        "DapAn": "B",
+        "GiaiThich": "Azure của Microsoft.",
+        "TrongSo": 1,
+        "ThuTu": 5
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What does CPU stand for?",
+        "LuaChon": "[{\"A\":\"Central Processing Unit\"},{\"B\":\"Computer Personal Unit\"},{\"C\":\"Central Power Unit\"},{\"D\":\"Control Processing Unit\"}]",
+        "DapAn": "A",
+        "GiaiThich": "CPU là bộ xử lý trung tâm.",
+        "TrongSo": 1,
+        "ThuTu": 6
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is a storage service in cloud computing?",
+        "LuaChon": "[{\"A\":\"Amazon S3\"},{\"B\":\"Google Maps\"},{\"C\":\"Chrome\"},{\"D\":\"TensorFlow\"}]",
+        "DapAn": "A",
+        "GiaiThich": "S3 là dịch vụ lưu trữ.",
+        "TrongSo": 1,
+        "ThuTu": 7
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is virtualization?",
+        "LuaChon": "[{\"A\":\"Creating virtual resources\"},{\"B\":\"Deleting data\"},{\"C\":\"Physical wiring\"},{\"D\":\"Programming UI\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Virtualization tạo máy ảo.",
+        "TrongSo": 1,
+        "ThuTu": 8
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which protocol is used for secure web communication?",
+        "LuaChon": "[{\"A\":\"HTTP\"},{\"B\":\"FTP\"},{\"C\":\"HTTPS\"},{\"D\":\"SMTP\"}]",
+        "DapAn": "C",
+        "GiaiThich": "HTTPS bảo mật.",
+        "TrongSo": 1,
+        "ThuTu": 9
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What does SaaS mean?",
+        "LuaChon": "[{\"A\":\"Software as a Service\"},{\"B\":\"Storage as a Service\"},{\"C\":\"System as a Service\"},{\"D\":\"Security as a Service\"}]",
+        "DapAn": "A",
+        "GiaiThich": "SaaS là phần mềm dạng dịch vụ.",
+        "TrongSo": 1,
+        "ThuTu": 10
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is a cloud provider?",
+        "LuaChon": "[{\"A\":\"AWS\"},{\"B\":\"HTML\"},{\"C\":\"CSS\"},{\"D\":\"Linux Kernel\"}]",
+        "DapAn": "A",
+        "GiaiThich": "AWS là cloud provider.",
+        "TrongSo": 1,
+        "ThuTu": 11
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is scalability in cloud?",
+        "LuaChon": "[{\"A\":\"Ability to expand resources\"},{\"B\":\"Deleting servers\"},{\"C\":\"Writing code\"},{\"D\":\"Encrypting files\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Mở rộng tài nguyên linh hoạt.",
+        "TrongSo": 1,
+        "ThuTu": 12
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is a virtual machine?",
+        "LuaChon": "[{\"A\":\"Software computer\"},{\"B\":\"Physical CPU\"},{\"C\":\"Network cable\"},{\"D\":\"Database table\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Máy tính ảo.",
+        "TrongSo": 1,
+        "ThuTu": 13
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is NOT a cloud model?",
+        "LuaChon": "[{\"A\":\"IaaS\"},{\"B\":\"PaaS\"},{\"C\":\"DaaS\"},{\"D\":\"SaaS\"}]",
+        "DapAn": "C",
+        "GiaiThich": "DaaS không phổ biến như model chính.",
+        "TrongSo": 1,
+        "ThuTu": 14
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is backup in cloud?",
+        "LuaChon": "[{\"A\":\"Copy of data\"},{\"B\":\"Delete data\"},{\"C\":\"Encrypt only\"},{\"D\":\"Run program\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Sao lưu dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 15
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is cloud advantage?",
+        "LuaChon": "[{\"A\":\"Scalability\"},{\"B\":\"High cost only\"},{\"C\":\"No internet needed\"},{\"D\":\"Limited access\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Cloud linh hoạt.",
+        "TrongSo": 1,
+        "ThuTu": 16
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is latency?",
+        "LuaChon": "[{\"A\":\"Delay time\"},{\"B\":\"Storage size\"},{\"C\":\"CPU speed\"},{\"D\":\"RAM size\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Độ trễ.",
+        "TrongSo": 1,
+        "ThuTu": 17
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is cloud security?",
+        "LuaChon": "[{\"A\":\"Protecting data\"},{\"B\":\"Deleting files\"},{\"C\":\"Installing apps\"},{\"D\":\"Writing code\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Bảo mật dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 18
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is a database service?",
+        "LuaChon": "[{\"A\":\"AWS RDS\"},{\"B\":\"Google Docs\"},{\"C\":\"Excel\"},{\"D\":\"Paint\"}]",
+        "DapAn": "A",
+        "GiaiThich": "RDS là database cloud.",
+        "TrongSo": 1,
+        "ThuTu": 19
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is load balancing?",
+        "LuaChon": "[{\"A\":\"Distribute traffic\"},{\"B\":\"Delete servers\"},{\"C\":\"Encrypt files\"},{\"D\":\"Compile code\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Phân tải hệ thống.",
+        "TrongSo": 1,
+        "ThuTu": 20
+      }
+    ]
+  },
+  {
+    "TieuDe": "Test 2: Artificial Intelligence Concepts",
+    "TgLamPhut": 30,
+    "TongDiem": 100,
+    "CauHoi": [
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is the primary field of AI that processes human speech?",
+        "LuaChon": "[{\"A\":\"Computer Vision\"},{\"B\":\"NLP\"},{\"C\":\"Robotics\"},{\"D\":\"Blockchain\"}]",
+        "DapAn": "B",
+        "GiaiThich": "NLP xử lý ngôn ngữ.",
+        "TrongSo": 1,
+        "ThuTu": 1
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "The process of teaching AI is called ___.",
+        "LuaChon": "[{\"A\":\"Learning\"},{\"B\":\"Coding\"},{\"C\":\"Training\"},{\"D\":\"Testing\"}]",
+        "DapAn": "C",
+        "GiaiThich": "Training.",
+        "TrongSo": 1,
+        "ThuTu": 2
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "AI for image recognition is called ___.",
+        "LuaChon": "[{\"A\":\"NLP\"},{\"B\":\"Computer Vision\"},{\"C\":\"Data Mining\"},{\"D\":\"Networking\"}]",
+        "DapAn": "B",
+        "GiaiThich": "Computer Vision.",
+        "TrongSo": 1,
+        "ThuTu": 3
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "AI stands for ___.",
+        "LuaChon": "[{\"A\":\"Automated Input\"},{\"B\":\"Artificial Intelligence\"},{\"C\":\"Advanced Internet\"},{\"D\":\"Applied Informatics\"}]",
+        "DapAn": "B",
+        "GiaiThich": "AI là Artificial Intelligence.",
+        "TrongSo": 1,
+        "ThuTu": 4
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which algorithm is used for classification?",
+        "LuaChon": "[{\"A\":\"KNN\"},{\"B\":\"FTP\"},{\"C\":\"HTML\"},{\"D\":\"DNS\"}]",
+        "DapAn": "A",
+        "GiaiThich": "KNN dùng phân loại.",
+        "TrongSo": 1,
+        "ThuTu": 5
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is supervised learning?",
+        "LuaChon": "[{\"A\":\"Learning with labels\"},{\"B\":\"No data\"},{\"C\":\"Random guessing\"},{\"D\":\"Manual coding\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Có dữ liệu gán nhãn.",
+        "TrongSo": 1,
+        "ThuTu": 6
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is deep learning?",
+        "LuaChon": "[{\"A\":\"Neural networks\"},{\"B\":\"Database system\"},{\"C\":\"File system\"},{\"D\":\"Network protocol\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Mạng neural.",
+        "TrongSo": 1,
+        "ThuTu": 7
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is used in AI speech recognition?",
+        "LuaChon": "[{\"A\":\"RNN\"},{\"B\":\"HTML\"},{\"C\":\"CSS\"},{\"D\":\"SQL\"}]",
+        "DapAn": "A",
+        "GiaiThich": "RNN xử lý chuỗi.",
+        "TrongSo": 1,
+        "ThuTu": 8
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is dataset?",
+        "LuaChon": "[{\"A\":\"Collection of data\"},{\"B\":\"Program\"},{\"C\":\"CPU\"},{\"D\":\"Network\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Tập dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 9
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is overfitting?",
+        "LuaChon": "[{\"A\":\"Model learns too well\"},{\"B\":\"Model fails always\"},{\"C\":\"No training\"},{\"D\":\"No data\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Học quá khớp dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 10
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is a Python library for AI?",
+        "LuaChon": "[{\"A\":\"TensorFlow\"},{\"B\":\"Photoshop\"},{\"C\":\"Excel\"},{\"D\":\"Word\"}]",
+        "DapAn": "A",
+        "GiaiThich": "TensorFlow dùng AI.",
+        "TrongSo": 1,
+        "ThuTu": 11
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is reinforcement learning?",
+        "LuaChon": "[{\"A\":\"Learning by reward\"},{\"B\":\"No learning\"},{\"C\":\"Manual coding\"},{\"D\":\"Random data\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Học bằng thưởng/phạt.",
+        "TrongSo": 1,
+        "ThuTu": 12
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is feature in ML?",
+        "LuaChon": "[{\"A\":\"Input variable\"},{\"B\":\"Output only\"},{\"C\":\"Error\"},{\"D\":\"Model name\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Biến đầu vào.",
+        "TrongSo": 1,
+        "ThuTu": 13
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is prediction?",
+        "LuaChon": "[{\"A\":\"Guess output\"},{\"B\":\"Delete data\"},{\"C\":\"Train model\"},{\"D\":\"Store file\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Dự đoán.",
+        "TrongSo": 1,
+        "ThuTu": 14
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is unsupervised learning?",
+        "LuaChon": "[{\"A\":\"Clustering\"},{\"B\":\"Classification\"},{\"C\":\"Regression\"},{\"D\":\"Labeling\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Phân cụm.",
+        "TrongSo": 1,
+        "ThuTu": 15
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is accuracy?",
+        "LuaChon": "[{\"A\":\"Correct predictions rate\"},{\"B\":\"Speed\"},{\"C\":\"Memory\"},{\"D\":\"CPU usage\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Độ chính xác.",
+        "TrongSo": 1,
+        "ThuTu": 16
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is loss function?",
+        "LuaChon": "[{\"A\":\"Error measure\"},{\"B\":\"Data storage\"},{\"C\":\"Network speed\"},{\"D\":\"CPU power\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Hàm lỗi.",
+        "TrongSo": 1,
+        "ThuTu": 17
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is model?",
+        "LuaChon": "[{\"A\":\"AI system\"},{\"B\":\"Database\"},{\"C\":\"File\"},{\"D\":\"Folder\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Mô hình AI.",
+        "TrongSo": 1,
+        "ThuTu": 18
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is training data?",
+        "LuaChon": "[{\"A\":\"Data used to train model\"},{\"B\":\"Test data only\"},{\"C\":\"Random file\"},{\"D\":\"Backup data\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Dữ liệu huấn luyện.",
+        "TrongSo": 1,
+        "ThuTu": 19
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is AI goal?",
+        "LuaChon": "[{\"A\":\"Simulate human intelligence\"},{\"B\":\"Store files\"},{\"C\":\"Design UI\"},{\"D\":\"Build hardware\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Mô phỏng trí tuệ người.",
+        "TrongSo": 1,
+        "ThuTu": 20
+      }
+    ]
+  },
+  {
+    "TieuDe": "Test 3: Software Development English",
+    "TgLamPhut": 30,
+    "TongDiem": 100,
+    "CauHoi": [
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "In Git, which command is used to send code to a remote server?",
+        "LuaChon": "[{\"A\":\"git pull\"},{\"B\":\"git commit\"},{\"C\":\"git push\"},{\"D\":\"git add\"}]",
+        "DapAn": "C",
+        "GiaiThich": "git push.",
+        "TrongSo": 1,
+        "ThuTu": 1
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which command downloads repository?",
+        "LuaChon": "[{\"A\":\"git push\"},{\"B\":\"git clone\"},{\"C\":\"git add\"},{\"D\":\"git commit\"}]",
+        "DapAn": "B",
+        "GiaiThich": "git clone.",
+        "TrongSo": 1,
+        "ThuTu": 2
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Meaning of bug?",
+        "LuaChon": "[{\"A\":\"Feature\"},{\"B\":\"Error\"},{\"C\":\"Tool\"},{\"D\":\"Design\"}]",
+        "DapAn": "B",
+        "GiaiThich": "Bug là lỗi.",
+        "TrongSo": 1,
+        "ThuTu": 3
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is commit in Git?",
+        "LuaChon": "[{\"A\":\"Save changes\"},{\"B\":\"Delete repo\"},{\"C\":\"Run code\"},{\"D\":\"Deploy app\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Lưu thay đổi.",
+        "TrongSo": 1,
+        "ThuTu": 4
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is repository?",
+        "LuaChon": "[{\"A\":\"Code storage\"},{\"B\":\"CPU\"},{\"C\":\"RAM\"},{\"D\":\"Browser\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Kho code.",
+        "TrongSo": 1,
+        "ThuTu": 5
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is pull request?",
+        "LuaChon": "[{\"A\":\"Request merge code\"},{\"B\":\"Delete branch\"},{\"C\":\"Run program\"},{\"D\":\"Compile code\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Yêu cầu merge.",
+        "TrongSo": 1,
+        "ThuTu": 6
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is IDE?",
+        "LuaChon": "[{\"A\":\"Coding tool\"},{\"B\":\"Database\"},{\"C\":\"OS\"},{\"D\":\"Server\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Môi trường lập trình.",
+        "TrongSo": 1,
+        "ThuTu": 7
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is debugging?",
+        "LuaChon": "[{\"A\":\"Fixing errors\"},{\"B\":\"Writing UI\"},{\"C\":\"Deleting code\"},{\"D\":\"Saving file\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Sửa lỗi.",
+        "TrongSo": 1,
+        "ThuTu": 8
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is frontend?",
+        "LuaChon": "[{\"A\":\"UI part\"},{\"B\":\"Database\"},{\"C\":\"Server\"},{\"D\":\"Hardware\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Giao diện người dùng.",
+        "TrongSo": 1,
+        "ThuTu": 9
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is backend?",
+        "LuaChon": "[{\"A\":\"Server logic\"},{\"B\":\"UI\"},{\"C\":\"Browser\"},{\"D\":\"Screen\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Xử lý server.",
+        "TrongSo": 1,
+        "ThuTu": 10
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is API?",
+        "LuaChon": "[{\"A\":\"Application interface\"},{\"B\":\"CPU\"},{\"C\":\"RAM\"},{\"D\":\"OS\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Giao tiếp phần mềm.",
+        "TrongSo": 1,
+        "ThuTu": 11
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is framework?",
+        "LuaChon": "[{\"A\":\"Development structure\"},{\"B\":\"Virus\"},{\"C\":\"File\"},{\"D\":\"CPU\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Khung phát triển.",
+        "TrongSo": 1,
+        "ThuTu": 12
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is variable?",
+        "LuaChon": "[{\"A\":\"Storage value\"},{\"B\":\"CPU\"},{\"C\":\"Network\"},{\"D\":\"System\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Biến lưu dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 13
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is function?",
+        "LuaChon": "[{\"A\":\"Reusable code block\"},{\"B\":\"Virus\"},{\"C\":\"File\"},{\"D\":\"Folder\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Hàm.",
+        "TrongSo": 1,
+        "ThuTu": 14
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is loop?",
+        "LuaChon": "[{\"A\":\"Repeat code\"},{\"B\":\"Stop program\"},{\"C\":\"Delete file\"},{\"D\":\"Open app\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Vòng lặp.",
+        "TrongSo": 1,
+        "ThuTu": 15
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is compile?",
+        "LuaChon": "[{\"A\":\"Convert code to machine language\"},{\"B\":\"Delete code\"},{\"C\":\"Run UI\"},{\"D\":\"Save file\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Biên dịch.",
+        "TrongSo": 1,
+        "ThuTu": 16
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is runtime?",
+        "LuaChon": "[{\"A\":\"Program execution time\"},{\"B\":\"Design time\"},{\"C\":\"Compile time\"},{\"D\":\"Save time\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Thời gian chạy.",
+        "TrongSo": 1,
+        "ThuTu": 17
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is syntax?",
+        "LuaChon": "[{\"A\":\"Code rules\"},{\"B\":\"CPU\"},{\"C\":\"RAM\"},{\"D\":\"OS\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Cú pháp.",
+        "TrongSo": 1,
+        "ThuTu": 18
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is library?",
+        "LuaChon": "[{\"A\":\"Reusable code collection\"},{\"B\":\"Virus\"},{\"C\":\"Hardware\"},{\"D\":\"OS\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Thư viện code.",
+        "TrongSo": 1,
+        "ThuTu": 19
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is deployment?",
+        "LuaChon": "[{\"A\":\"Publish app\"},{\"B\":\"Delete app\"},{\"C\":\"Write code\"},{\"D\":\"Design UI\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Triển khai ứng dụng.",
+        "TrongSo": 1,
+        "ThuTu": 20
+      }
+    ]
+  },
+  {
+    "TieuDe": "Test 4: Data Analytics Basics",
+    "TgLamPhut": 30,
+    "TongDiem": 100,
+    "CauHoi": [
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is data analysis?",
+        "LuaChon": "[{\"A\":\"Processing data to extract insights\"},{\"B\":\"Writing code only\"},{\"C\":\"Deleting files\"},{\"D\":\"Design UI\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Phân tích dữ liệu để rút ra insight.",
+        "TrongSo": 1,
+        "ThuTu": 1
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which tool is commonly used for data visualization?",
+        "LuaChon": "[{\"A\":\"Power BI\"},{\"B\":\"Notepad\"},{\"C\":\"Paint\"},{\"D\":\"Word\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Power BI dùng để trực quan hóa.",
+        "TrongSo": 1,
+        "ThuTu": 2
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is dataset?",
+        "LuaChon": "[{\"A\":\"Collection of data\"},{\"B\":\"CPU\"},{\"C\":\"Network\"},{\"D\":\"App\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Tập dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 3
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which language is popular in data analysis?",
+        "LuaChon": "[{\"A\":\"Python\"},{\"B\":\"HTML\"},{\"C\":\"CSS\"},{\"D\":\"Assembly\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Python phổ biến.",
+        "TrongSo": 1,
+        "ThuTu": 4
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is data cleaning?",
+        "LuaChon": "[{\"A\":\"Removing incorrect data\"},{\"B\":\"Deleting database\"},{\"C\":\"Coding UI\"},{\"D\":\"Encrypting data\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Làm sạch dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 5
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which chart shows trends over time?",
+        "LuaChon": "[{\"A\":\"Line chart\"},{\"B\":\"Pie chart\"},{\"C\":\"Table\"},{\"D\":\"Text\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Line chart thể hiện xu hướng.",
+        "TrongSo": 1,
+        "ThuTu": 6
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is KPI?",
+        "LuaChon": "[{\"A\":\"Key Performance Indicator\"},{\"B\":\"Key Program Input\"},{\"C\":\"Kernel Process Index\"},{\"D\":\"Known Program Item\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Chỉ số đánh giá hiệu suất.",
+        "TrongSo": 1,
+        "ThuTu": 7
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which tool handles spreadsheets?",
+        "LuaChon": "[{\"A\":\"Excel\"},{\"B\":\"Photoshop\"},{\"C\":\"VS Code\"},{\"D\":\"Chrome\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Excel xử lý bảng.",
+        "TrongSo": 1,
+        "ThuTu": 8
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is filtering?",
+        "LuaChon": "[{\"A\":\"Selecting specific data\"},{\"B\":\"Deleting all data\"},{\"C\":\"Encrypting data\"},{\"D\":\"Drawing chart\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Lọc dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 9
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is aggregation?",
+        "LuaChon": "[{\"A\":\"Summarizing data\"},{\"B\":\"Deleting data\"},{\"C\":\"Coding UI\"},{\"D\":\"Backup only\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Tổng hợp dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 10
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is SQL used for?",
+        "LuaChon": "[{\"A\":\"Query data\"},{\"B\":\"Design UI\"},{\"C\":\"Edit video\"},{\"D\":\"Draw charts\"}]",
+        "DapAn": "A",
+        "GiaiThich": "SQL dùng truy vấn dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 11
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is a database?",
+        "LuaChon": "[{\"A\":\"Data storage system\"},{\"B\":\"CPU\"},{\"C\":\"Monitor\"},{\"D\":\"Keyboard\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Hệ lưu trữ dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 12
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is null value?",
+        "LuaChon": "[{\"A\":\"Missing data\"},{\"B\":\"Zero\"},{\"C\":\"Text\"},{\"D\":\"False\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Giá trị thiếu.",
+        "TrongSo": 1,
+        "ThuTu": 13
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which function calculates average?",
+        "LuaChon": "[{\"A\":\"AVG\"},{\"B\":\"SUM\"},{\"C\":\"COUNT\"},{\"D\":\"MAX\"}]",
+        "DapAn": "A",
+        "GiaiThich": "AVG tính trung bình.",
+        "TrongSo": 1,
+        "ThuTu": 14
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is sorting?",
+        "LuaChon": "[{\"A\":\"Arrange data\"},{\"B\":\"Delete data\"},{\"C\":\"Encrypt\"},{\"D\":\"Backup\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Sắp xếp dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 15
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which chart compares categories?",
+        "LuaChon": "[{\"A\":\"Bar chart\"},{\"B\":\"Line chart\"},{\"C\":\"Text\"},{\"D\":\"Code\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Bar chart so sánh.",
+        "TrongSo": 1,
+        "ThuTu": 16
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is dashboard?",
+        "LuaChon": "[{\"A\":\"Visual report\"},{\"B\":\"Code\"},{\"C\":\"CPU\"},{\"D\":\"Network\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Báo cáo trực quan.",
+        "TrongSo": 1,
+        "ThuTu": 17
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is trend?",
+        "LuaChon": "[{\"A\":\"Pattern over time\"},{\"B\":\"Random data\"},{\"C\":\"Error\"},{\"D\":\"File\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Xu hướng.",
+        "TrongSo": 1,
+        "ThuTu": 18
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is numeric data?",
+        "LuaChon": "[{\"A\":\"123\"},{\"B\":\"Text\"},{\"C\":\"Image\"},{\"D\":\"Video\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Dữ liệu số.",
+        "TrongSo": 1,
+        "ThuTu": 19
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is insight?",
+        "LuaChon": "[{\"A\":\"Meaningful finding\"},{\"B\":\"Raw data\"},{\"C\":\"Code\"},{\"D\":\"Error\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Kết luận có giá trị.",
+        "TrongSo": 1,
+        "ThuTu": 20
+      }
+    ]
+  },
+  {
+    "TieuDe": "Test 5: Cloud & DevOps",
+    "TgLamPhut": 30,
+    "TongDiem": 100,
+    "CauHoi": [
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is DevOps?",
+        "LuaChon": "[{\"A\":\"Development + Operations\"},{\"B\":\"Design only\"},{\"C\":\"Security only\"},{\"D\":\"Testing only\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Kết hợp Dev và Ops.",
+        "TrongSo": 1,
+        "ThuTu": 1
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is CI/CD?",
+        "LuaChon": "[{\"A\":\"Continuous Integration/Delivery\"},{\"B\":\"Code Index\"},{\"C\":\"Compile Data\"},{\"D\":\"Cloud Disk\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Tích hợp và triển khai liên tục.",
+        "TrongSo": 1,
+        "ThuTu": 2
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which tool is used for containerization?",
+        "LuaChon": "[{\"A\":\"Docker\"},{\"B\":\"Excel\"},{\"C\":\"Word\"},{\"D\":\"Chrome\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Docker tạo container.",
+        "TrongSo": 1,
+        "ThuTu": 3
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is Kubernetes?",
+        "LuaChon": "[{\"A\":\"Container orchestration\"},{\"B\":\"Database\"},{\"C\":\"IDE\"},{\"D\":\"OS\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Quản lý container.",
+        "TrongSo": 1,
+        "ThuTu": 4
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is uptime?",
+        "LuaChon": "[{\"A\":\"System availability\"},{\"B\":\"CPU speed\"},{\"C\":\"Memory size\"},{\"D\":\"Code size\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Thời gian hệ thống hoạt động.",
+        "TrongSo": 1,
+        "ThuTu": 5
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is monitoring?",
+        "LuaChon": "[{\"A\":\"Tracking system performance\"},{\"B\":\"Deleting data\"},{\"C\":\"Coding UI\"},{\"D\":\"Backup only\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Giám sát hệ thống.",
+        "TrongSo": 1,
+        "ThuTu": 6
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which cloud service stores objects?",
+        "LuaChon": "[{\"A\":\"S3\"},{\"B\":\"EC2\"},{\"C\":\"Lambda\"},{\"D\":\"RDS\"}]",
+        "DapAn": "A",
+        "GiaiThich": "S3 lưu object.",
+        "TrongSo": 1,
+        "ThuTu": 7
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is container?",
+        "LuaChon": "[{\"A\":\"Lightweight app environment\"},{\"B\":\"CPU\"},{\"C\":\"Network\"},{\"D\":\"RAM\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Môi trường chạy ứng dụng nhẹ.",
+        "TrongSo": 1,
+        "ThuTu": 8
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is deployment automation?",
+        "LuaChon": "[{\"A\":\"Auto release app\"},{\"B\":\"Manual coding\"},{\"C\":\"Delete system\"},{\"D\":\"Backup only\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Triển khai tự động.",
+        "TrongSo": 1,
+        "ThuTu": 9
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is scaling?",
+        "LuaChon": "[{\"A\":\"Increase resources\"},{\"B\":\"Delete server\"},{\"C\":\"Reduce RAM\"},{\"D\":\"Compile code\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Mở rộng hệ thống.",
+        "TrongSo": 1,
+        "ThuTu": 10
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is cloud region?",
+        "LuaChon": "[{\"A\":\"Geographic data center\"},{\"B\":\"CPU\"},{\"C\":\"Code\"},{\"D\":\"App\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Khu vực server.",
+        "TrongSo": 1,
+        "ThuTu": 11
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is fault tolerance?",
+        "LuaChon": "[{\"A\":\"System survives failure\"},{\"B\":\"Delete system\"},{\"C\":\"Slow speed\"},{\"D\":\"Low memory\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Chịu lỗi.",
+        "TrongSo": 1,
+        "ThuTu": 12
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is redundancy?",
+        "LuaChon": "[{\"A\":\"Backup resources\"},{\"B\":\"Delete data\"},{\"C\":\"Code UI\"},{\"D\":\"Compile\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Dự phòng.",
+        "TrongSo": 1,
+        "ThuTu": 13
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is SLA?",
+        "LuaChon": "[{\"A\":\"Service agreement\"},{\"B\":\"CPU\"},{\"C\":\"RAM\"},{\"D\":\"Disk\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Cam kết dịch vụ.",
+        "TrongSo": 1,
+        "ThuTu": 14
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is latency optimization?",
+        "LuaChon": "[{\"A\":\"Reduce delay\"},{\"B\":\"Increase delay\"},{\"C\":\"Delete data\"},{\"D\":\"Backup\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Giảm độ trễ.",
+        "TrongSo": 1,
+        "ThuTu": 15
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is autoscaling?",
+        "LuaChon": "[{\"A\":\"Auto adjust resources\"},{\"B\":\"Delete server\"},{\"C\":\"Manual code\"},{\"D\":\"Backup\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Tự động mở rộng.",
+        "TrongSo": 1,
+        "ThuTu": 16
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which is CI tool?",
+        "LuaChon": "[{\"A\":\"Jenkins\"},{\"B\":\"Word\"},{\"C\":\"Excel\"},{\"D\":\"Paint\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Jenkins CI.",
+        "TrongSo": 1,
+        "ThuTu": 17
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is pipeline?",
+        "LuaChon": "[{\"A\":\"Automation workflow\"},{\"B\":\"CPU\"},{\"C\":\"File\"},{\"D\":\"Network\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Luồng tự động.",
+        "TrongSo": 1,
+        "ThuTu": 18
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is rollback?",
+        "LuaChon": "[{\"A\":\"Revert deployment\"},{\"B\":\"Delete data\"},{\"C\":\"Compile code\"},{\"D\":\"Run UI\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Quay lại phiên bản.",
+        "TrongSo": 1,
+        "ThuTu": 19
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is cloud migration?",
+        "LuaChon": "[{\"A\":\"Move to cloud\"},{\"B\":\"Delete data\"},{\"C\":\"Code UI\"},{\"D\":\"Compile\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Chuyển lên cloud.",
+        "TrongSo": 1,
+        "ThuTu": 20
+      }
+    ]
+  },
+  {
+    "TieuDe": "Test 6: Advanced AI & Machine Learning",
+    "TgLamPhut": 30,
+    "TongDiem": 100,
+    "CauHoi": [
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is machine learning?",
+        "LuaChon": "[{\"A\":\"Learning from data\"},{\"B\":\"Manual coding\"},{\"C\":\"Hardware design\"},{\"D\":\"Network setup\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Học từ dữ liệu.",
+        "TrongSo": 1,
+        "ThuTu": 1
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is regression?",
+        "LuaChon": "[{\"A\":\"Predict continuous values\"},{\"B\":\"Classify labels\"},{\"C\":\"Delete data\"},{\"D\":\"Encrypt data\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Dự đoán giá trị liên tục.",
+        "TrongSo": 1,
+        "ThuTu": 2
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "Which algorithm is for clustering?",
+        "LuaChon": "[{\"A\":\"K-means\"},{\"B\":\"KNN\"},{\"C\":\"CNN\"},{\"D\":\"RNN\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Phân cụm.",
+        "TrongSo": 1,
+        "ThuTu": 3
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is neural network?",
+        "LuaChon": "[{\"A\":\"Brain-inspired model\"},{\"B\":\"Database\"},{\"C\":\"File system\"},{\"D\":\"Network cable\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Mô phỏng não người.",
+        "TrongSo": 1,
+        "ThuTu": 4
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is epoch?",
+        "LuaChon": "[{\"A\":\"One training cycle\"},{\"B\":\"CPU speed\"},{\"C\":\"Memory size\"},{\"D\":\"File type\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Một vòng huấn luyện.",
+        "TrongSo": 1,
+        "ThuTu": 5
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is precision?",
+        "LuaChon": "[{\"A\":\"Correct positive rate\"},{\"B\":\"Speed\"},{\"C\":\"Memory\"},{\"D\":\"Loss\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Độ chính xác dương.",
+        "TrongSo": 1,
+        "ThuTu": 6
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is recall?",
+        "LuaChon": "[{\"A\":\"Detected positives\"},{\"B\":\"Speed\"},{\"C\":\"Memory\"},{\"D\":\"CPU\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Tỷ lệ phát hiện đúng.",
+        "TrongSo": 1,
+        "ThuTu": 7
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is gradient descent?",
+        "LuaChon": "[{\"A\":\"Optimization algorithm\"},{\"B\":\"Database\"},{\"C\":\"UI tool\"},{\"D\":\"Network\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Tối ưu hàm.",
+        "TrongSo": 1,
+        "ThuTu": 8
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is bias in model?",
+        "LuaChon": "[{\"A\":\"Systematic error\"},{\"B\":\"Random data\"},{\"C\":\"CPU issue\"},{\"D\":\"File error\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Sai lệch hệ thống.",
+        "TrongSo": 1,
+        "ThuTu": 9
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is AI application?",
+        "LuaChon": "[{\"A\":\"Chatbot\"},{\"B\":\"Cable\"},{\"C\":\"RAM\"},{\"D\":\"Monitor\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Ứng dụng AI.",
+        "TrongSo": 1,
+        "ThuTu": 10
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is training set?",
+        "LuaChon": "[{\"A\":\"Data for training\"},{\"B\":\"Test only\"},{\"C\":\"CPU\"},{\"D\":\"File\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Dữ liệu huấn luyện.",
+        "TrongSo": 1,
+        "ThuTu": 11
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is test set?",
+        "LuaChon": "[{\"A\":\"Evaluate model\"},{\"B\":\"Train model\"},{\"C\":\"Delete data\"},{\"D\":\"Backup\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Đánh giá model.",
+        "TrongSo": 1,
+        "ThuTu": 12
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is F1-score?",
+        "LuaChon": "[{\"A\":\"Balance precision recall\"},{\"B\":\"Speed\"},{\"C\":\"Memory\"},{\"D\":\"CPU\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Cân bằng precision/recall.",
+        "TrongSo": 1,
+        "ThuTu": 13
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is hyperparameter?",
+        "LuaChon": "[{\"A\":\"Model setting\"},{\"B\":\"Data\"},{\"C\":\"CPU\"},{\"D\":\"File\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Tham số điều chỉnh.",
+        "TrongSo": 1,
+        "ThuTu": 14
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is cross-validation?",
+        "LuaChon": "[{\"A\":\"Model validation\"},{\"B\":\"Delete data\"},{\"C\":\"Compile\"},{\"D\":\"UI\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Đánh giá mô hình.",
+        "TrongSo": 1,
+        "ThuTu": 15
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is classification?",
+        "LuaChon": "[{\"A\":\"Predict category\"},{\"B\":\"Predict number\"},{\"C\":\"Delete\"},{\"D\":\"Code UI\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Phân loại.",
+        "TrongSo": 1,
+        "ThuTu": 16
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is training error?",
+        "LuaChon": "[{\"A\":\"Error on train data\"},{\"B\":\"CPU error\"},{\"C\":\"File error\"},{\"D\":\"RAM error\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Sai số train.",
+        "TrongSo": 1,
+        "ThuTu": 17
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is validation set?",
+        "LuaChon": "[{\"A\":\"Tune model\"},{\"B\":\"Delete data\"},{\"C\":\"CPU\"},{\"D\":\"Network\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Dữ liệu điều chỉnh.",
+        "TrongSo": 1,
+        "ThuTu": 18
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is AI bias?",
+        "LuaChon": "[{\"A\":\"Unfair model\"},{\"B\":\"CPU\"},{\"C\":\"RAM\"},{\"D\":\"File\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Thiên lệch AI.",
+        "TrongSo": 1,
+        "ThuTu": 19
+      },
+      {
+        "Loai": "TracNghiem",
+        "NoiDung": "What is automation in AI?",
+        "LuaChon": "[{\"A\":\"Auto decision\"},{\"B\":\"Manual coding\"},{\"C\":\"Delete data\"},{\"D\":\"Compile\"}]",
+        "DapAn": "A",
+        "GiaiThich": "Tự động hóa.",
+        "TrongSo": 1,
+        "ThuTu": 20
+      }
+    ]
+  }
+]

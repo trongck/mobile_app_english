@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="facebook_app_id">947331061585968</string>
+    <string name="fb_login_protocol_scheme">fb947331061585968</string>
+    <string name="facebook_client_token">f4cb860bef5a8737b6f32d7498656f54</string>
+    <string name="app_name">DevTalk English</string>
+    
+</resources>
