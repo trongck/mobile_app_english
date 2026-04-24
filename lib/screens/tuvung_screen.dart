@@ -362,7 +362,7 @@ class _TuVungCardState extends State<_TuVungCard> {
   Future<void> _speak() async {
     HapticFeedback.lightImpact();
     await _tts.setLanguage('en-US');
-    await _tts.setSpeechRate(0.65);
+    await _tts.setSpeechRate(0.45);
     await _tts.speak(widget.tu.tu);
   }
 

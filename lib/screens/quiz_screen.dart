@@ -505,7 +505,7 @@ class _LamBaiScreenState extends State<LamBaiScreen> with TickerProviderStateMix
 
   Widget _buildAnswerWidget(CauHoiKT ch) {
     switch (ch.loai) {
-      case 'tracnghiem':
+      case 'trac_nghiem':
         final opts = ch.luaChon ?? [];
         return Column(children: opts.map((o) {
           final ky = o['ky_hieu']?.toString() ?? '';
