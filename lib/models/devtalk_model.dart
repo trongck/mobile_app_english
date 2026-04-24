@@ -19,23 +19,23 @@ class GT {
 
   Map<String, dynamic> toMap() {
     return {
-      if (maGT != null) 'MaGT': maGT,
-      'PhienBan': phienBan,
-      'TT': tt,
-      'TieuDe': tieuDe,
-      'MoTa': moTa,
-      'Anh': anh,
+      if (maGT != null) 'magt': maGT,
+      'phienban': phienBan,
+      'tt': tt,
+      'tieude': tieuDe,
+      'mota': moTa,
+      'anh': anh,
     };
   }
 
   factory GT.fromMap(Map<String, dynamic> map) {
     return GT(
-      maGT: map['MaGT'] as int?,
-      phienBan: map['PhienBan'] as String? ?? '1.0',
-      tt: map['TT'] as int,
-      tieuDe: map['TieuDe'] as String,
-      moTa: map['MoTa'] as String?,
-      anh: map['Anh'] as String?,
+      maGT: map['magt'] as int?,
+      phienBan: map['phienban'] as String? ?? '1.0',
+      tt: map['tt'] as int,
+      tieuDe: map['tieude'] as String,
+      moTa: map['mota'] as String?,
+      anh: map['anh'] as String?,
     );
   }
 
@@ -92,33 +92,33 @@ class NguoiDung {
 
   Map<String, dynamic> toMap() {
     return {
-      if (maND != null) 'MaND': maND,
-      'Email': email,
-      'MatKhau': matKhau,
-      'HoTen': hoTen,
-      'NgaySinh': ngaySinh,
-      'TrinhDo': trinhDo,
-      'MucTieuCapDo': mucTieuCapDo,
-      'HocVi': hocVi,
-      'MucTieuPhut': mucTieuPhut,
-      'XacMinhEmail': xacMinhEmail ? 1 : 0,
-      'NgayTao': ngayTao,
+      if (maND != null) 'mand': maND,
+      'email': email,
+      'matkhau': matKhau,
+      'hoten': hoTen,
+      'ngaysinh': ngaySinh,
+      'trinhdo': trinhDo,
+      'muctieucapdo': mucTieuCapDo,
+      'hocvi': hocVi,
+      'muctieuphut': mucTieuPhut,
+      'xacminhemail': xacMinhEmail ? 1 : 0,
+      'ngaytao': ngayTao,
     };
   }
 
   factory NguoiDung.fromMap(Map<String, dynamic> map) {
     return NguoiDung(
-      maND: map['MaND'] as int?,
-      email: map['Email'] as String,
-      matKhau: map['MatKhau'] as String,
-      hoTen: map['HoTen'] as String?,
-      ngaySinh: map['NgaySinh'] as String?,
-      trinhDo: map['TrinhDo'] as String? ?? 'A1',
-      mucTieuCapDo: map['MucTieuCapDo'] as String? ?? 'A2',
-      hocVi: map['HocVi'] as String?,
-      mucTieuPhut: map['MucTieuPhut'] as int? ?? 15,
-      xacMinhEmail: (map['XacMinhEmail'] as int? ?? 0) == 1,
-      ngayTao: map['NgayTao'] as String?,
+      maND: map['mand'] as int?,
+      email: map['email'] as String,
+      matKhau: map['matkhau'] as String,
+      hoTen: map['hoten'] as String?,
+      ngaySinh: map['ngaysinh'] as String?,
+      trinhDo: map['trinhdo'] as String? ?? 'A1',
+      mucTieuCapDo: map['muctieucapdo'] as String? ?? 'A2',
+      hocVi: map['hocvi'] as String?,
+      mucTieuPhut: map['muctieuphut'] as int? ?? 15,
+      xacMinhEmail: (map['xacminhemail'] as int? ?? 0) == 1,
+      ngayTao: map['ngaytao'] as String?,
     );
   }
 
@@ -167,15 +167,15 @@ class CDTuVung {
 
   Map<String, dynamic> toMap() {
     return {
-      if (maCD != null) 'MaCD': maCD,
-      'TenCD': tenCD,
+      if (maCD != null) 'macd': maCD,
+      'tencd': tenCD,
     };
   }
 
   factory CDTuVung.fromMap(Map<String, dynamic> map) {
     return CDTuVung(
-      maCD: map['MaCD'] as int?,
-      tenCD: map['TenCD'] as String,
+      maCD: map['macd'] as int?,
+      tenCD: map['tencd'] as String,
     );
   }
 
@@ -220,33 +220,33 @@ class TuVung {
 
   Map<String, dynamic> toMap() {
     return {
-      if (maTu != null) 'MaTu': maTu,
-      'Tu': tu,
-      'PhienAm': phienAm,
-      'AmThanh': amThanh,
-      'NghiaEN': nghiaEN,
-      'NghiaVI': nghiaVI,
-      'VdEN': vdEN,
-      'VdVI': vdVI,
-      'TuLoai': tuLoai,
-      'MaCD': maCD,
-      'YeuThich': yeuThich ? 1 : 0,
+      if (maTu != null) 'matu': maTu,
+      'tu': tu,
+      'phienam': phienAm,
+      'amthanh': amThanh,
+      'nghiaen': nghiaEN,
+      'nghiavi': nghiaVI,
+      'vden': vdEN,
+      'vdvi': vdVI,
+      'tuloai': tuLoai,
+      'macd': maCD,
+      'yeuthich': yeuThich ? 1 : 0,
     };
   }
 
   factory TuVung.fromMap(Map<String, dynamic> map) {
     return TuVung(
-      maTu: map['MaTu'] as int?,
-      tu: map['Tu'] as String,
-      phienAm: map['PhienAm'] as String?,
-      amThanh: map['AmThanh'] as String?,
-      nghiaEN: map['NghiaEN'] as String,
-      nghiaVI: map['NghiaVI'] as String?,
-      vdEN: map['VdEN'] as String?,
-      vdVI: map['VdVI'] as String?,
-      tuLoai: map['TuLoai'] as String?,
-      maCD: map['MaCD'] as int?,
-      yeuThich: (map['YeuThich'] as int? ?? 0) == 1,
+      maTu: map['matu'] as int?,
+      tu: map['tu'] as String,
+      phienAm: map['phienam'] as String?,
+      amThanh: map['amthanh'] as String?,
+      nghiaEN: map['nghiaen'] as String,
+      nghiaVI: map['nghiavi'] as String?,
+      vdEN: map['vden'] as String?,
+      vdVI: map['vdvi'] as String?,
+      tuLoai: map['tuloai'] as String?,
+      maCD: map['macd'] as int?,
+     
     );
   }
 
@@ -261,7 +261,7 @@ class TuVung {
     String? vdVI,
     String? tuLoai,
     int? maCD,
-    bool? yeuThich,
+   
   }) {
     return TuVung(
       maTu: maTu ?? this.maTu,
@@ -274,13 +274,13 @@ class TuVung {
       vdVI: vdVI ?? this.vdVI,
       tuLoai: tuLoai ?? this.tuLoai,
       maCD: maCD ?? this.maCD,
-      yeuThich: yeuThich ?? this.yeuThich,
+      
     );
   }
 
   @override
   String toString() =>
-      'TuVung(maTu: $maTu, tu: $tu, nghiaEN: $nghiaEN, yeuThich: $yeuThich)';
+      'TuVung(maTu: $maTu, tu: $tu, nghiaEN: $nghiaEN)';
 }
 
 
@@ -299,19 +299,19 @@ class BaiKT {
 
   Map<String, dynamic> toMap() {
     return {
-      if (maBKT != null) 'MaBKT': maBKT,
-      'TieuDe': tieuDe,
-      'TgLamPhut': tgLamPhut,
-      'TongDiem': tongDiem,
+      if (maBKT != null) 'mabkt': maBKT,
+      'tieude': tieuDe,
+      'tglamphut': tgLamPhut,
+      'tongdiem': tongDiem,
     };
   }
 
   factory BaiKT.fromMap(Map<String, dynamic> map) {
     return BaiKT(
-      maBKT: map['MaBKT'] as int?,
-      tieuDe: map['TieuDe'] as String,
-      tgLamPhut: map['TgLamPhut'] as int?,
-      tongDiem: map['TongDiem'] as int? ?? 100,
+      maBKT: map['mabkt'] as int?,
+      tieuDe: map['tieude'] as String,
+      tgLamPhut: map['tglamphut'] as int?,
+      tongDiem: map['tongdiem'] as int? ?? 100,
     );
   }
 
@@ -360,34 +360,34 @@ class CauHoiKT {
 
   Map<String, dynamic> toMap() {
     return {
-      if (maCH != null) 'MaCH': maCH,
-      'MaBKT': maBKT,
-      'Loai': loai,
-      'NoiDung': noiDung,
-      'LuaChon': luaChon != null ? jsonEncode(luaChon) : null,
-      'DapAn': dapAn,
-      'GiaiThich': giaiThich,
-      'TrongSo': trongSo,
-      'ThuTu': thuTu,
+      if (maCH != null) 'mach': maCH,
+      'mabkt': maBKT,
+      'loai': loai,
+      'noidung': noiDung,
+      'luachon': luaChon != null ? jsonEncode(luaChon) : null,
+      'dapan': dapAn,
+      'giaithich': giaiThich,
+      'trongso': trongSo,
+      'thutu': thuTu,
     };
   }
 
   factory CauHoiKT.fromMap(Map<String, dynamic> map) {
     List<Map<String, dynamic>>? luaChon;
-    if (map['LuaChon'] != null) {
-      final decoded = jsonDecode(map['LuaChon'] as String);
+    if (map['luachon'] != null) {
+      final decoded = jsonDecode(map['luachon'] as String);
       luaChon = List<Map<String, dynamic>>.from(decoded);
     }
     return CauHoiKT(
-      maCH: map['MaCH'] as int?,
-      maBKT: map['MaBKT'] as int,
-      loai: map['Loai'] as String,
-      noiDung: map['NoiDung'] as String,
+      maCH: map['mach'] as int?,
+      maBKT: map['mabkt'] as int,
+      loai: map['loai'] as String,
+      noiDung: map['noidung'] as String,
       luaChon: luaChon,
-      dapAn: map['DapAn'] as String,
-      giaiThich: map['GiaiThich'] as String?,
-      trongSo: map['TrongSo'] as int? ?? 1,
-      thuTu: map['ThuTu'] as int? ?? 0,
+      dapAn: map['dapan'] as String,
+      giaiThich: map['giaithich'] as String?,
+      trongSo: map['trongso'] as int? ?? 1,
+      thuTu: map['thutu'] as int? ?? 0,
     );
   }
 
@@ -444,28 +444,28 @@ class LSKiemTra {
 
   Map<String, dynamic> toMap() {
     return {
-      if (maLS != null) 'MaLS': maLS,
-      'MaND': maND,
-      'MaBKT': maBKT,
-      'CauTraLoi': jsonEncode(cauTraLoi),
-      'Diem': diem,
-      'TgLam': tgLam,
-      'TgBatDau': tgBatDau,
-      'TgNopBai': tgNopBai,
+      if (maLS != null) 'mals': maLS,
+      'mand': maND,
+      'mabkt': maBKT,
+      'cautraloi': jsonEncode(cauTraLoi),
+      'diem': diem,
+      'tglam': tgLam,
+      'tgbatdau': tgBatDau,
+      'tgnopbai': tgNopBai,
     };
   }
 
   factory LSKiemTra.fromMap(Map<String, dynamic> map) {
     return LSKiemTra(
-      maLS: map['MaLS'] as int?,
-      maND: map['MaND'] as int,
-      maBKT: map['MaBKT'] as int,
+      maLS: map['mals'] as int?,
+      maND: map['mand'] as int,
+      maBKT: map['mabkt'] as int,
       cauTraLoi: Map<String, dynamic>.from(
-          jsonDecode(map['CauTraLoi'] as String)),
-      diem: map['Diem'] as int?,
-      tgLam: map['TgLam'] as int?,
-      tgBatDau: map['TgBatDau'] as String?,
-      tgNopBai: map['TgNopBai'] as String?,
+          jsonDecode(map['cautraloi'] as String)),
+      diem: map['diem'] as int?,
+      tgLam: map['tglam'] as int?,
+      tgBatDau: map['tgbatdau'] as String?,
+      tgNopBai: map['tgnopbai'] as String?,
     );
   }
 
@@ -516,23 +516,23 @@ class NhatKy {
 
   Map<String, dynamic> toMap() {
     return {
-      if (maNK != null) 'MaNK': maNK,
-      'MaND': maND,
-      'NgayHoc': ngayHoc,
-      'TgOn': tgOn,
-      'TgOff': tgOff,
-      'TgHoc': tgHoc,
+      if (maNK != null) 'mank': maNK,
+      'mand': maND,
+      'ngayhoc': ngayHoc,
+      'tgon': tgOn,
+      'tgoff': tgOff,
+      'tghoc': tgHoc,
     };
   }
 
   factory NhatKy.fromMap(Map<String, dynamic> map) {
     return NhatKy(
-      maNK: map['MaNK'] as int?,
-      maND: map['MaND'] as int,
-      ngayHoc: map['NgayHoc'] as String,
-      tgOn: map['TgOn'] as String,
-      tgOff: map['TgOff'] as String,
-      tgHoc: map['TgHoc'] as int,
+      maNK: map['mank'] as int?,
+      maND: map['mand'] as int,
+      ngayHoc: map['ngayhoc'] as String,
+      tgOn: map['tgon'] as String,
+      tgOff: map['tgoff'] as String,
+      tgHoc: map['tghoc'] as int,
     );
   }
 
@@ -572,17 +572,17 @@ class XacThucEmail {
 
   Map<String, dynamic> toMap() {
     return {
-      'Email': email,
-      'MaOTP': maOTP,
-      'ThoiGianHetHan': thoiGianHetHan,
+      'email': email,
+      'maotp': maOTP,
+      'thoigianhethan': thoiGianHetHan,
     };
   }
 
   factory XacThucEmail.fromMap(Map<String, dynamic> map) {
     return XacThucEmail(
-      email: map['Email'] as String,
-      maOTP: map['MaOTP'] as String,
-      thoiGianHetHan: map['ThoiGianHetHan'] as String,
+      email: map['email'] as String,
+      maOTP: map['maotp'] as String,
+      thoiGianHetHan: map['thoigianhethan'] as String,
     );
   }
 
@@ -619,19 +619,19 @@ class NguoiDungTuVung {
 
   Map<String, dynamic> toMap() {
     return {
-      'MaND': maND,
-      'MaTu': maTu,
-      'DaHoc': daHoc ? 1 : 0,
-      'YeuThich': yeuThich ? 1 : 0,
+      'mand': maND,
+      'matu': maTu,
+      'dahoc': daHoc ? 1 : 0,
+      'yeuthich': yeuThich ? 1 : 0,
     };
   }
 
   factory NguoiDungTuVung.fromMap(Map<String, dynamic> map) {
     return NguoiDungTuVung(
-      maND: map['MaND'] as int,
-      maTu: map['MaTu'] as int,
-      daHoc: (map['DaHoc'] as int? ?? 0) == 1,
-      yeuThich: (map['YeuThich'] as int? ?? 0) == 1,
+      maND: map['mand'] as int,
+      maTu: map['matu'] as int,
+      daHoc: (map['dahoc'] as int? ?? 0) == 1,
+      yeuThich: (map['yeuthich'] as int? ?? 0) == 1,
     );
   }
 

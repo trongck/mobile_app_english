@@ -1,70 +1,74 @@
-import '../database_helper.dart';
+import "package:supabase_flutter/supabase_flutter.dart";
 import '../../models/devtalk_model.dart';
 
 class NhatKyRepository {
-  final DatabaseHelper _db = DatabaseHelper();
+  final supabase = Supabase.instance.client;
 
   Future<int> them(NhatKy nk) async {
-    final db = await _db.database;
-    return await db.insert('NhatKy', nk.toMap());
+    final response = await supabase
+        .from('nhatky')
+        .insert(nk.toMap())
+        .select('mank');
+    return response.first['mank'] as int;
   }
 
   Future<List<NhatKy>> layTheoND(int maND) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'NhatKy',
-      where: 'MaND = ?',
-      whereArgs: [maND],
-      orderBy: 'NgayHoc DESC',
-    );
-    return rows.map((r) => NhatKy.fromMap(r)).toList();
+    final response = await supabase
+        .from('nhatky')
+        .select()
+        .eq('mand', maND)
+        .order('ngayhoc', ascending: false);
+    return response.map((r) => NhatKy.fromMap(r)).toList();
   }
 
   Future<NhatKy?> layTheoNgay(int maND, String ngayHoc) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'NhatKy',
-      where: 'MaND = ? AND NgayHoc = ?',
-      whereArgs: [maND, ngayHoc],
-      limit: 1,
-    );
-    if (rows.isEmpty) return null;
-    return NhatKy.fromMap(rows.first);
+    final response = await supabase
+        .from('nhatky')
+        .select()
+        .eq('mand', maND)
+        .eq('ngayhoc', ngayHoc)
+        .limit(1);
+
+    if (response.isEmpty) return null;
+    return NhatKy.fromMap(response.first);
   }
 
-  Future<List<NhatKy>> layTheoKhoang(
-      int maND, String tuNgay, String denNgay) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'NhatKy',
-      where: 'MaND = ? AND NgayHoc BETWEEN ? AND ?',
-      whereArgs: [maND, tuNgay, denNgay],
-      orderBy: 'NgayHoc ASC',
-    );
-    return rows.map((r) => NhatKy.fromMap(r)).toList();
+  Future<List<NhatKy>> layTheoKhoang(int maND, String tuNgay, String denNgay) async {
+    final response = await supabase
+        .from('nhatky')
+        .select()
+        .eq('mand', maND)
+        .gte('ngayhoc', tuNgay)
+        .lte('ngayhoc', denNgay)
+        .order('ngayhoc', ascending: true);
+    return response.map((r) => NhatKy.fromMap(r)).toList();
   }
 
-  Future<int> capNhat(NhatKy nk) async {
-    final db = await _db.database;
-    return await db.update(
-      'NhatKy',
-      nk.toMap(),
-      where: 'MaNK = ?',
-      whereArgs: [nk.maNK],
-    );
+ Future<int> capNhat(NhatKy nk) async {
+    final response = await supabase
+        .from('nhatky')
+        .update(nk.toMap())
+        .eq('mank', nk.maNK as int)
+        .select(); 
+    return response.length;
   }
 
   Future<int> tongPhutTheoThang(int maND, String thang) async {
-    final db = await _db.database;
-    final result = await db.rawQuery(
-      'SELECT SUM(TgHoc) as tong FROM NhatKy WHERE MaND = ? AND NgayHoc LIKE ?',
-      [maND, '$thang%'],
-    );
-    return (result.first['tong'] as int?) ?? 0;
+    final response = await supabase
+        .from('nhatky')
+        .select('tghoc')
+        .eq('mand', maND)
+        .like('ngayhoc', '$thang%');
+
+    int tong = 0;
+    for (var row in response) {
+      tong += row['tghoc'] as int;
+    }
+    return tong;
   }
 
   Future<int> xoa(int maNK) async {
-    final db = await _db.database;
-    return await db.delete('NhatKy', where: 'MaNK = ?', whereArgs: [maNK]);
+    await supabase.from('nhatky').delete().eq('mank', maNK);
+    return 1;
   }
 }

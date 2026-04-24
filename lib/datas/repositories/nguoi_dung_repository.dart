@@ -1,50 +1,64 @@
-import '../database_helper.dart';
+import "package:supabase_flutter/supabase_flutter.dart";
 import '../../models/devtalk_model.dart';
 
 class NguoiDungRepository {
-  final DatabaseHelper _db = DatabaseHelper();
+  final supabase = Supabase.instance.client;
 
   Future<int> them(NguoiDung nd) async {
-    final db = await _db.database;
-    return await db.insert('NguoiDung', nd.toMap());
+    final response = await supabase
+        .from('nguoidung')
+        .insert(nd.toMap())
+        .select('mand'); 
+    
+    return response.first['mand'] as int;
   }
 
   Future<NguoiDung?> layTheoId(int maND) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'NguoiDung',
-      where: 'MaND = ?',
-      whereArgs: [maND],
-      limit: 1,
-    );
-    if (rows.isEmpty) return null;
-    return NguoiDung.fromMap(rows.first);
+    final response = await supabase
+        .from('nguoidung')
+        .select()
+        .eq('mand', maND) 
+        .limit(1);
+
+    if (response.isEmpty) return null;
+    return NguoiDung.fromMap(response.first);
   }
 
   Future<NguoiDung?> layTheoEmail(String email) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'NguoiDung',
-      where: 'Email = ?',
-      whereArgs: [email],
-      limit: 1,
-    );
-    if (rows.isEmpty) return null;
-    return NguoiDung.fromMap(rows.first);
+    final response = await supabase
+        .from('nguoidung')
+        .select()
+        .eq('email', email) 
+        .limit(1);
+        
+    if (response.isEmpty) return null;
+    return NguoiDung.fromMap(response.first);
   }
 
   Future<int> capNhat(NguoiDung nd) async {
-    final db = await _db.database;
-    return await db.update(
-      'NguoiDung',
-      nd.toMap(),
-      where: 'MaND = ?',
-      whereArgs: [nd.maND],
-    );
+    if (nd.maND == null) {
+      throw ArgumentError("MaND cannot be null");
+    }
+    await supabase
+        .from('nguoidung')
+        .update(nd.toMap())
+        .eq('mand', nd.maND!); 
+    return 1;
+  }
+  
+  Future<int> capNhatMatKhau(int maND, String matKhauMoi) async {
+    final response = await supabase
+        .from('nguoidung')
+        .update({'matkhau': matKhauMoi}) 
+        .eq('mand', maND);
+    return response != null ? 1 : 0; 
   }
 
   Future<int> xoa(int maND) async {
-    final db = await _db.database;
-    return await db.delete('NguoiDung', where: 'MaND = ?', whereArgs: [maND]);
+    await supabase
+        .from('nguoidung')
+        .delete()
+        .eq('mand', maND);
+    return 1;
   }
 }

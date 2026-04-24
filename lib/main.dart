@@ -7,7 +7,7 @@ import 'providers/tu_vung_provider.dart';
 import 'providers/bai_kt_provider.dart';
 import 'providers/nhat_ky_provider.dart';
 import 'screens/splash_screen.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -16,6 +16,11 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  await Supabase.initialize(
+    url: 'https://nogdeylfdjttgymdgrpt.supabase.co',
+    anonKey: 'sb_publishable_LeXoTOUZ0u5wsn0dog94RA_5LYIw1vL',
+  );
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

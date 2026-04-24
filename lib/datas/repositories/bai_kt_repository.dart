@@ -1,101 +1,103 @@
-import '../database_helper.dart';
+import "package:supabase_flutter/supabase_flutter.dart";
 import '../../models/devtalk_model.dart';
 
 class BaiKTRepository {
-  final DatabaseHelper _db = DatabaseHelper();
-
+  final supabase = Supabase.instance.client;
+  
   Future<int> them(BaiKT bkt) async {
-    final db = await _db.database;
-    return await db.insert('BaiKT', bkt.toMap());
+    final response = await supabase
+        .from('baikt')
+        .insert(bkt.toMap())
+        .select('mabkt'); // Đã sửa
+    return response.first['mabkt'] as int;
   }
 
   Future<List<BaiKT>> layTatCa() async {
-    final db = await _db.database;
-    final rows = await db.query('BaiKT', orderBy: 'MaBKT DESC');
-    return rows.map((r) => BaiKT.fromMap(r)).toList();
+    final response = await supabase
+        .from('baikt')
+        .select()
+        .order('mabkt', ascending: false); // Đã sửa
+    return response.map((r) => BaiKT.fromMap(r)).toList();
   }
 
   Future<BaiKT?> layTheoId(int maBKT) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'BaiKT',
-      where: 'MaBKT = ?',
-      whereArgs: [maBKT],
-      limit: 1,
-    );
-    if (rows.isEmpty) return null;
-    return BaiKT.fromMap(rows.first);
+    final response = await supabase
+        .from('baikt')
+        .select()
+        .eq('mabkt', maBKT) // Đã sửa
+        .limit(1);
+
+    if (response.isEmpty) return null;
+    return BaiKT.fromMap(response.first);
   }
 
   Future<int> xoa(int maBKT) async {
-    final db = await _db.database;
-    return await db.delete('BaiKT', where: 'MaBKT = ?', whereArgs: [maBKT]);
+    await supabase.from('baikt').delete().eq('mabkt', maBKT);
+    return 1;
   }
 }
 
 class CauHoiKTRepository {
-  final DatabaseHelper _db = DatabaseHelper();
+  final supabase = Supabase.instance.client;
 
   Future<int> them(CauHoiKT ch) async {
-    final db = await _db.database;
-    return await db.insert('CauHoiKT', ch.toMap());
+    final response = await supabase
+        .from('cauhoikt')
+        .insert(ch.toMap())
+        .select('mach');
+    return response.first['mach'] as int;
   }
 
   Future<List<CauHoiKT>> layTheoBai(int maBKT) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'CauHoiKT',
-      where: 'MaBKT = ?',
-      whereArgs: [maBKT],
-      orderBy: 'ThuTu ASC',
-    );
-    return rows.map((r) => CauHoiKT.fromMap(r)).toList();
+    final response = await supabase
+        .from('cauhoikt')
+        .select()
+        .eq('mabkt', maBKT)
+        .order('thutu', ascending: true);
+    return response.map((r) => CauHoiKT.fromMap(r)).toList();
   }
 
   Future<int> xoa(int maCH) async {
-    final db = await _db.database;
-    return await db.delete('CauHoiKT', where: 'MaCH = ?', whereArgs: [maCH]);
+    await supabase.from('cauhoikt').delete().eq('mach', maCH);
+    return 1;
   }
 }
 
 class LSKiemTraRepository {
-  final DatabaseHelper _db = DatabaseHelper();
+  final supabase = Supabase.instance.client;
 
   Future<int> them(LSKiemTra ls) async {
-    final db = await _db.database;
-    return await db.insert('LSKiemTra', ls.toMap());
+    final response = await supabase
+        .from('lskiemtra')
+        .insert(ls.toMap())
+        .select('mals');
+    return response.first['mals'] as int;
   }
 
   Future<List<LSKiemTra>> layTheoND(int maND) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'LSKiemTra',
-      where: 'MaND = ?',
-      whereArgs: [maND],
-      orderBy: 'TgBatDau DESC',
-    );
-    return rows.map((r) => LSKiemTra.fromMap(r)).toList();
+    final response = await supabase
+        .from('lskiemtra')
+        .select()
+        .eq('mand', maND)
+        .order('tgbatdau', ascending: false);
+    return response.map((r) => LSKiemTra.fromMap(r)).toList();
   }
 
   Future<LSKiemTra?> layTheoId(int maLS) async {
-    final db = await _db.database;
-    final rows = await db.query(
-      'LSKiemTra',
-      where: 'MaLS = ?',
-      whereArgs: [maLS],
-      limit: 1,
-    );
-    if (rows.isEmpty) return null;
-    return LSKiemTra.fromMap(rows.first);
+    final response = await supabase
+        .from('lskiemtra')
+        .select()
+        .eq('mals', maLS)
+        .limit(1);
+    if (response.isEmpty) return null;
+    return LSKiemTra.fromMap(response.first);
   }
 
   Future<int> capNhatDiem(int maLS, int diem, int tgLam, String tgNopBai) async {
-    final db = await _db.database;
-    return await db.update(
-      'LSKiemTra',
-      {'Diem': diem, 'TgLam': tgLam, 'TgNopBai': tgNopBai},
-      where: 'MaLS = ?',
-      whereArgs: [maLS],
-    );
+    await supabase
+        .from('lskiemtra')
+        .update({'diem': diem, 'tglam': tgLam, 'tgnopbai': tgNopBai}) // Đã sửa
+        .eq('mals', maLS);
+    return 1;
   }
 }
