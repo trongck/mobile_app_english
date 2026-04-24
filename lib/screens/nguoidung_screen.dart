@@ -7,6 +7,7 @@ import '../providers/tu_vung_provider.dart';
 import '../providers/bai_kt_provider.dart';
 import '../models/devtalk_model.dart';
 
+
 class NguoiDungScreen extends StatefulWidget {
   const NguoiDungScreen({super.key});
   @override
@@ -63,6 +64,90 @@ class _NguoiDungScreenState extends State<NguoiDungScreen> with SingleTickerProv
       margin: const EdgeInsets.all(16),
     ));
     setState(() => _editMode = false);
+  }
+
+  Future<void> _showOtpDialog(BuildContext context, NguoiDungProvider provider, NguoiDung nd) async {
+    final otpController = TextEditingController();
+    bool isVerifying = false;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: const Color(0xFF131830), // Khớp với theme của app
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: const Text('Xác thực Email', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Vui lòng nhập mã OTP 6 số vừa được gửi đến email của bạn.', style: TextStyle(color: Colors.white70)),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: otpController,
+                    keyboardType: TextInputType.number,
+                    maxLength: 6,
+                    style: const TextStyle(color: Colors.white, letterSpacing: 8, fontSize: 20, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                    decoration: InputDecoration(
+                      hintText: '------',
+                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white.withOpacity(0.2)), borderRadius: BorderRadius.circular(12)),
+                      focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: Color(0xFF00D4FF)), borderRadius: BorderRadius.circular(12)),
+                      counterText: '', // Ẩn bộ đếm ký tự
+                    ),
+                  ),
+                  if (provider.error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(provider.error!, style: const TextStyle(color: Colors.redAccent, fontSize: 13, fontWeight: FontWeight.w600)),
+                  ]
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    provider.cancelOtpFlow();
+                    Navigator.pop(context);
+                  },
+                  child: Text('Hủy', style: TextStyle(color: Colors.white.withOpacity(0.5))),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00D4FF),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: isVerifying ? null : () async {
+                    setState(() => isVerifying = true);
+                    final success = await provider.xacMinhOtp(otpController.text);
+                    setState(() => isVerifying = false);
+                    
+                    if (success) {
+                      if (context.mounted) {
+                        Navigator.pop(context); // Đóng dialog
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('✅ Xác minh email thành công!', style: TextStyle(fontWeight: FontWeight.w600)),
+                            backgroundColor: const Color(0xFF00FF94).withOpacity(0.2),
+                            behavior: SnackBarBehavior.floating,
+                          )
+                        );
+                        // Force UI refresh
+                        setState(() {});
+                      }
+                    }
+                  },
+                  child: isVerifying 
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF080B1A))) 
+                      : const Text('Xác nhận', style: TextStyle(color: Color(0xFF080B1A), fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          }
+        );
+      },
+    );
   }
 
   @override
@@ -176,18 +261,56 @@ class _NguoiDungScreenState extends State<NguoiDungScreen> with SingleTickerProv
                   const SizedBox(height: 4),
                   Text(nd.email, style: TextStyle(color: Colors.white.withOpacity(0.45), fontSize: 13)),
                   const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: nd.xacMinhEmail ? const Color(0xFF00FF94).withOpacity(0.1) : Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: nd.xacMinhEmail ? const Color(0xFF00FF94).withOpacity(0.4) : Colors.orange.withOpacity(0.4)),
-                    ),
-                    child: Text(
-                      nd.xacMinhEmail ? '✅ Đã xác minh email' : '⚠️ Chưa xác minh email',
-                      style: TextStyle(
-                        color: nd.xacMinhEmail ? const Color(0xFF00FF94) : Colors.orange,
-                        fontSize: 11, fontWeight: FontWeight.w700,
+                  // THAY THẾ KHỐI CONAINER CŨ BẰNG ĐOẠN NÀY
+                  const SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: nd.xacMinhEmail ? null : () async {
+                      HapticFeedback.lightImpact();
+                      final provider = context.read<NguoiDungProvider>();
+                      
+                      // Bật loading mờ nếu cần (tùy chọn)
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Đang gửi mã OTP...'), duration: Duration(seconds: 1)),
+                      );
+
+                      // Gửi OTP
+                      final ok = await provider.guiLaiOtp(
+                        email: nd.email, 
+                        userName: nd.hoTen,
+                        maND: nd.maND, // Đảm bảo truyền mã ND
+                      );
+                      
+                      if (ok && context.mounted) {
+                        _showOtpDialog(context, provider, nd);
+                      } else if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(provider.error ?? 'Gửi OTP thất bại'), backgroundColor: Colors.redAccent),
+                        );
+                      }
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: nd.xacMinhEmail ? const Color(0xFF00FF94).withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: nd.xacMinhEmail ? const Color(0xFF00FF94).withOpacity(0.4) : Colors.orange.withOpacity(0.4)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            nd.xacMinhEmail ? '✅ Đã xác minh email' : '⚠️ Chưa xác minh (Bấm để xác nhận)',
+                            style: TextStyle(
+                              color: nd.xacMinhEmail ? const Color(0xFF00FF94) : Colors.orange,
+                              fontSize: 11, fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          if (!nd.xacMinhEmail) ...[
+                            const SizedBox(width: 4),
+                            const Icon(Icons.arrow_forward_ios_rounded, size: 9, color: Colors.orange),
+                          ]
+                        ],
                       ),
                     ),
                   ),

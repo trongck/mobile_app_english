@@ -53,7 +53,12 @@ class NguoiDungRepository {
         .eq('mand', maND);
     return response != null ? 1 : 0; 
   }
-
+  Future<void> capNhatXacMinhEmail(int maND, bool isVerified) async {
+    
+    await supabase.from('nguoidung').update({
+      'xacminhemail': isVerified ? 1 : 0, 
+    }).eq('mand', maND);
+  }
   Future<int> xoa(int maND) async {
     await supabase
         .from('nguoidung')

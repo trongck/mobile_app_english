@@ -114,20 +114,61 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     HapticFeedback.mediumImpact();
     final p = context.read<NguoiDungProvider>();
-    bool ok;
+
     if (_isLogin) {
-      ok = await p.dangNhapEmail(_emailCtrl.text.trim(), _pwdCtrl.text);
+      // ── ĐĂNG NHẬP ──────────────────────────────────────────────
+      final ok = await p.dangNhapEmail(_emailCtrl.text.trim(), _pwdCtrl.text);
+      if (!mounted) return;
+      if (ok) {
+        _showToast('Đăng nhập thành công!');
+        await Future.delayed(const Duration(milliseconds: 500));
+        _navigateToMain();
+      } else {
+        _showToast(p.error ?? 'Có lỗi xảy ra', isError: true);
+        p.clearError();
+      }
     } else {
+      // ── ĐĂNG KÝ ────────────────────────────────────────────────
       final id = await p.dangKyEmail(
-        email: _emailCtrl.text.trim(), matKhau: _pwdCtrl.text, hoTen: _nameCtrl.text.trim(),
-        trinhDo: widget.trinhDo, mucTieuCapDo: widget.mucTieuCapDo,
-        hocVi: widget.hocVi, mucTieuPhut: widget.mucTieuPhut,
+        email: _emailCtrl.text.trim(),
+        matKhau: _pwdCtrl.text,
+        hoTen: _nameCtrl.text.trim(),
+        trinhDo: widget.trinhDo,
+        mucTieuCapDo: widget.mucTieuCapDo,
+        hocVi: widget.hocVi,
+        mucTieuPhut: widget.mucTieuPhut,
       );
-      ok = id > 0;
+      if (!mounted) return;
+
+      if (id == 1) {
+        // Tài khoản tạo thành công → hiện dialog OTP
+        _showToast('Mã OTP đã gửi đến ${_emailCtrl.text.trim()}');
+        await _showOtpDialog(p);
+        // Sau khi dialog đóng: nếu đã xác minh thì _nguoiDung != null
+        if (!mounted) return;
+        if (p.daDangNhap) {
+          _navigateToMain();
+        }
+      } else if (id == -1) {
+        _showToast(p.error ?? 'Email đã được sử dụng', isError: true);
+        p.clearError();
+      } else {
+        _showToast(p.error ?? 'Có lỗi xảy ra', isError: true);
+        p.clearError();
+      }
     }
-    if (!mounted) return;
-    if (ok) { _showToast(_isLogin ? 'Đăng nhập thành công!' : 'Tài khoản đã được tạo!'); await Future.delayed(const Duration(milliseconds: 500)); _navigateToMain(); }
-    else { _showToast(p.error ?? 'Có lỗi xảy ra', isError: true); p.clearError(); }
+  }
+
+  Future<void> _showOtpDialog(NguoiDungProvider provider) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => _OtpDialog(
+        provider: provider,
+        email: _emailCtrl.text.trim(),
+        userName: _nameCtrl.text.trim(),
+      ),
+    );
   }
 
   void _toggleMode() {
@@ -282,6 +323,144 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
             )),
           ),
       ]),
+    );
+  }
+}
+
+// ─── OTP Dialog ──────────────────────────────────────────────────────────────
+
+class _OtpDialog extends StatefulWidget {
+  final NguoiDungProvider provider;
+  final String email;
+  final String userName;
+  const _OtpDialog({required this.provider, required this.email, required this.userName});
+
+  @override
+  State<_OtpDialog> createState() => _OtpDialogState();
+}
+
+class _OtpDialogState extends State<_OtpDialog> {
+  final _otpCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _otpCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: widget.provider,
+      builder: (_, __) {
+        final isLoading = widget.provider.isLoading;
+        final error = widget.provider.error;
+
+        return AlertDialog(
+          backgroundColor: const Color(0xFF131830),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Xác thực Email',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          content: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Text(
+                'Nhập mã OTP 6 số được gửi đến\n${widget.email}',
+                style: const TextStyle(color: Colors.white70),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _otpCtrl,
+                keyboardType: TextInputType.number,
+                maxLength: 6,
+                autofocus: true,
+                style: const TextStyle(
+                    color: Colors.white,
+                    letterSpacing: 8,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  hintText: '------',
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.2)),
+                  counterText: '',
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                      borderRadius: BorderRadius.circular(12)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(color: Color(0xFF00D4FF)),
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              if (error != null) ...[
+                const SizedBox(height: 8),
+                Text(error,
+                    style: const TextStyle(color: Colors.redAccent, fontSize: 13),
+                    textAlign: TextAlign.center),
+              ],
+            ]),
+          ),
+          actions: [
+            // Bỏ qua → đăng nhập luôn dù chưa xác minh email
+            TextButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      // Load user vào provider và đăng nhập
+                      await widget.provider.dangNhapSauDangKy();
+                      if (context.mounted) Navigator.pop(context);
+                    },
+              child: Text('Bỏ qua', style: TextStyle(color: Colors.white.withOpacity(0.5))),
+            ),
+            // Gửi lại
+            TextButton(
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      await widget.provider.guiLaiOtp(
+                        email: widget.email,
+                        userName: widget.userName,
+                      );
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(widget.provider.error == null
+                              ? '📧 Đã gửi lại OTP!'
+                              : 'Gửi thất bại'),
+                          backgroundColor: const Color(0xFF131830),
+                          behavior: SnackBarBehavior.floating,
+                        ));
+                      }
+                    },
+              child: const Text('Gửi lại', style: TextStyle(color: Color(0xFF00D4FF))),
+            ),
+            // Xác nhận
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF00D4FF),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      final success =
+                          await widget.provider.xacMinhOtp(_otpCtrl.text.trim());
+                      if (success && context.mounted) {
+                        Navigator.pop(context);
+                      }
+                    },
+              child: isLoading
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Color(0xFF080B1A)))
+                  : const Text('Xác nhận',
+                      style: TextStyle(
+                          color: Color(0xFF080B1A), fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
