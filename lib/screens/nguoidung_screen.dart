@@ -57,8 +57,8 @@ class _NguoiDungScreenState extends State<NguoiDungScreen> with SingleTickerProv
     final ok = await ndP.capNhatHoSo(updated);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(ok ? '✅ Đã lưu hồ sơ!' : '❌ Lưu thất bại'),
-      backgroundColor: ok ? const Color(0xFF00FF94).withOpacity(0.15) : Colors.redAccent.withOpacity(0.15),
+      content: Text(ok ? 'Đã lưu hồ sơ!' : 'Lưu thất bại'),
+      backgroundColor: ok ? const Color.fromARGB(255, 0, 255, 149).withOpacity(1) : Colors.redAccent.withOpacity(1),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.all(16),
@@ -128,7 +128,7 @@ class _NguoiDungScreenState extends State<NguoiDungScreen> with SingleTickerProv
                         Navigator.pop(context); // Đóng dialog
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text('✅ Xác minh email thành công!', style: TextStyle(fontWeight: FontWeight.w600)),
+                            content: const Text('Xác minh email thành công!', style: TextStyle(fontWeight: FontWeight.w600)),
                             backgroundColor: const Color(0xFF00FF94).withOpacity(0.2),
                             behavior: SnackBarBehavior.floating,
                           )
@@ -300,7 +300,7 @@ class _NguoiDungScreenState extends State<NguoiDungScreen> with SingleTickerProv
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            nd.xacMinhEmail ? '✅ Đã xác minh email' : '⚠️ Chưa xác minh (Bấm để xác nhận)',
+                            nd.xacMinhEmail ? 'Đã xác minh email' : 'Chưa xác minh (Bấm để xác nhận)',
                             style: TextStyle(
                               color: nd.xacMinhEmail ? const Color(0xFF00FF94) : Colors.orange,
                               fontSize: 11, fontWeight: FontWeight.w700,
@@ -644,11 +644,11 @@ class _NhatKyChart extends StatelessWidget {
       ),
       const SizedBox(height: 10),
       Row(children: [
-        _NKStat('⏱️ Tổng tuần', '$totalMin phút', const Color(0xFF00D4FF)),
+        _NKStat('Tổng tuần', '$totalMin phút', const Color(0xFF00D4FF)),
         const SizedBox(width: 8),
-        _NKStat('✅ Đạt mục tiêu', '$daysReached/7 ngày', const Color(0xFF00FF94)),
+        _NKStat('Đạt mục tiêu', '$daysReached/7 ngày', const Color(0xFF00FF94)),
         const SizedBox(width: 8),
-        _NKStat('🔥 Streak', '$chuoiNgay ngày', const Color(0xFFFFD700)),
+        _NKStat('Streak', '$chuoiNgay ngày', const Color(0xFFFFD700)),
       ]),
     ]);
   }

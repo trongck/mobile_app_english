@@ -282,9 +282,9 @@ class _OnTapTabState extends State<_OnTapTab> with SingleTickerProviderStateMixi
       Padding(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
         child: Row(children: [
-          _SubTab(ctrl: _sub, idx: 0, label: '❤️ Yêu thích', color: const Color(0xFFFF3CAC)),
+          _SubTab(ctrl: _sub, idx: 0, label: 'Yêu thích', color: const Color(0xFFFF3CAC)),
           const SizedBox(width: 8),
-          _SubTab(ctrl: _sub, idx: 1, label: '✅ Đã học', color: const Color(0xFF00FF94)),
+          _SubTab(ctrl: _sub, idx: 1, label: 'Đã học', color: const Color(0xFF00FF94)),
         ]),
       ),
       Expanded(
@@ -293,7 +293,7 @@ class _OnTapTabState extends State<_OnTapTab> with SingleTickerProviderStateMixi
           children: [
             Consumer<TuVungProvider>(builder: (_, p, __) {
               if (p.isLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFFFF3CAC), strokeWidth: 2));
-              if (p.tuYeuThich.isEmpty) return _EmptyState(msg: 'Chưa có từ yêu thích\nNhấn ❤️ để thêm', icon: '❤️');
+              if (p.tuYeuThich.isEmpty) return _EmptyState(msg: 'Bạn chưa có từ yêu thích !', icon: '❤️');
               return ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
@@ -303,7 +303,7 @@ class _OnTapTabState extends State<_OnTapTab> with SingleTickerProviderStateMixi
             }),
             Consumer<TuVungProvider>(builder: (_, p, __) {
               if (p.isLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFF00FF94), strokeWidth: 2));
-              if (p.tuDaHoc.isEmpty) return _EmptyState(msg: 'Chưa có từ đã học\nNhấn ✅ để đánh dấu', icon: '📚');
+              if (p.tuDaHoc.isEmpty) return _EmptyState(msg: 'Bạn chưa học từ nào !', icon: '📚');
               return ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),

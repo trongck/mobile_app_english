@@ -9,7 +9,7 @@ import 'dart:math' as math;
 // ════════════════════════════════════════════════════════════════════════════
 //  CONSTANTS
 // ════════════════════════════════════════════════════════════════════════════
-const _kGeminiKey = 'AIzaSyBedtMIrCS20y5lgMY-C-RN13m7-7AAWLg';
+const _kGeminiKey = 'AIzaSyBk4xqBvdB4k1OzLak0lLC85q_IaU8hcKM';
 const _kGeminiModel = 'gemini-3-flash-preview';
 const _kGeminiUrl =
     'https://generativelanguage.googleapis.com/v1beta/models/$_kGeminiModel:generateContent?key=$_kGeminiKey';
@@ -192,11 +192,11 @@ Rules:
       case ChatMode.vocabLearn:
         return '''You are DevTalk AI — a vocabulary teaching assistant for IT English.
 When user gives a word/phrase, provide:
-📚 **[WORD]** /phonetic/
-🔤 *[part of speech]* — [Vietnamese meaning]
-💡 Example 1: [sentence]
-💡 Example 2: [sentence]
-🔥 Tip: [memory trick]
+ **[WORD]** /phonetic/
+ *[part of speech]* — [Vietnamese meaning]
+ Example 1: [sentence]
+ Example 2: [sentence]
+ Tip: [memory trick]
 Then ask user to use the word in a sentence. Evaluate and praise their attempt.''';
 
       case ChatMode.pronunciation:
@@ -383,13 +383,13 @@ class _ChatbotScreenState extends State<ChatbotScreen>
       if (!mounted) return;
       setState(() {
         _messages.add(ChatMessage(
-          text: '👋 Xin chào! Tôi là **DevTalk AI**, trợ lý học tiếng Anh IT của bạn.\n\n'
+          text: ' Xin chào! Tôi là **DevTalk AI**, trợ lý học tiếng Anh IT của bạn.\n\n'
               'Tôi có thể giúp bạn:\n'
-              '• 💬 Trò chuyện tiếng Anh tự nhiên\n'
-              '• 📚 Học từ vựng IT chuyên sâu\n'
-              '• 🎤 Luyện phát âm thuật ngữ kỹ thuật\n'
-              '• 🧠 Quiz kiểm tra từ vựng\n\n'
-              'Chọn ngôn ngữ mic (🇻🇳/🇺🇸/🔄) và chế độ học ở trên, rồi bắt đầu nào! 🚀',
+              '•  Trò chuyện tiếng Anh tự nhiên\n'
+              '•  Học từ vựng IT chuyên sâu\n'
+              '•  Luyện phát âm thuật ngữ kỹ thuật\n'
+              '•  Quiz kiểm tra từ vựng\n\n'
+              'Chọn ngôn ngữ mic (🇻🇳/🇺🇸/) và chế độ học ở trên, rồi bắt đầu nào! ',
           isUser: false,
           time: DateTime.now(),
         ));
@@ -478,7 +478,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
         setState(() {
           _messages.removeLast();
           _messages.add(ChatMessage(
-            text: '⚠️ Lỗi: ${e.toString().replaceAll('Exception: ', '')}',
+            text: ' Lỗi: ${e.toString().replaceAll('Exception: ', '')}',
             isUser: false,
             time: DateTime.now(),
           ));
@@ -645,19 +645,19 @@ class _ChatbotScreenState extends State<ChatbotScreen>
     });
 
     final modeNames = {
-      ChatMode.freeChat: '💬 Trò chuyện tự do',
-      ChatMode.vocabLearn: '📚 Học từ vựng',
-      ChatMode.pronunciation: '🎤 Luyện phát âm',
-      ChatMode.quiz: '🧠 Quiz kiểm tra',
+      ChatMode.freeChat: ' Trò chuyện tự do',
+      ChatMode.vocabLearn: ' Học từ vựng',
+      ChatMode.pronunciation: 'Luyện phát âm',
+      ChatMode.quiz: ' Quiz kiểm tra',
     };
     final modeIntros = {
       ChatMode.freeChat:
-          'Chế độ trò chuyện tự do! Viết hoặc nói bất kỳ điều gì. 💬',
+          'Chế độ trò chuyện tự do! Viết hoặc nói bất kỳ điều gì. ',
       ChatMode.vocabLearn:
-          'Chế độ học từ vựng! Gửi từ IT bạn muốn học (ví dụ: "microservice"). 📚',
+          'Chế độ học từ vựng! Gửi từ IT bạn muốn học (ví dụ: "microservice"). ',
       ChatMode.pronunciation:
-          'Chế độ luyện phát âm! Gửi thuật ngữ bạn muốn học cách đọc (ví dụ: "SQL"). 🎤',
-      ChatMode.quiz: 'Quiz IT English bắt đầu! Gõ "bắt đầu" để chơi! 🧠',
+          'Chế độ luyện phát âm! Gửi thuật ngữ bạn muốn học cách đọc (ví dụ: "SQL"). ',
+      ChatMode.quiz: 'Quiz IT English bắt đầu! Gõ "bắt đầu" để chơi! ',
     };
 
     setState(() {
@@ -731,7 +731,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
   // ── Mic language selector ────────────────────────────────────────────────
   Widget _buildMicLangSelector() {
     final langs = [
-      (MicLang.auto, '🔄', 'Tự động'),
+      (MicLang.auto, '', 'Tự động'),
       (MicLang.vietnamese, '🇻🇳', 'Tiếng Việt'),
       (MicLang.english, '🇺🇸', 'English'),
     ];
@@ -800,7 +800,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
         ? '🇻🇳 Đang nghe tiếng Việt...'
         : _micLang == MicLang.english
             ? '🇺🇸 Listening in English...'
-            : '🔄 Đang nghe... (VI/EN)';
+            : 'Đang nghe... (VI/EN)';
 
     return AnimatedBuilder(
       animation: _micPulseAnim,
@@ -904,10 +904,10 @@ class _ChatbotScreenState extends State<ChatbotScreen>
                 _isLoading
                     ? 'Đang suy nghĩ...'
                     : _isListening
-                        ? '🎤 Đang nghe...'
+                        ? ' Đang nghe...'
                         : _isSpeaking
-                            ? '🔊 Đang đọc...'
-                            : 'VI 🇻🇳 + EN 🇺🇸 | Powered by Gemini',
+                            ? 'Đang đọc...'
+                            : 'Powered by Gemini',
                 key: ValueKey(
                     '$_isLoading$_isListening$_isSpeaking'),
                 style: TextStyle(
@@ -1003,10 +1003,10 @@ class _ChatbotScreenState extends State<ChatbotScreen>
   // ── Mode selector ─────────────────────────────────────────────────────────
   Widget _buildModeSelector() {
     final modes = [
-      (ChatMode.freeChat, '💬', 'Chat'),
-      (ChatMode.vocabLearn, '📚', 'Từ vựng'),
-      (ChatMode.pronunciation, '🎤', 'Phát âm'),
-      (ChatMode.quiz, '🧠', 'Quiz'),
+      (ChatMode.freeChat, '', 'Chat'),
+      (ChatMode.vocabLearn, '', 'Từ vựng'),
+      (ChatMode.pronunciation, '', 'Phát âm'),
+      (ChatMode.quiz, '', 'Quiz'),
     ];
 
     return Container(
@@ -1411,8 +1411,8 @@ class _ChatbotScreenState extends State<ChatbotScreen>
               decoration: InputDecoration(
                 hintText: _isListening
                     ? (_micLang == MicLang.english
-                        ? '🎤 Listening...'
-                        : '🎤 Đang nghe...')
+                        ? ' Listening...'
+                        : ' Đang nghe...')
                     : 'Nhập hoặc nói (VI/EN)...',
                 hintStyle: TextStyle(
                     color: Colors.white.withOpacity(0.3),

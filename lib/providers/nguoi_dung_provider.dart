@@ -189,7 +189,7 @@ class NguoiDungProvider extends ChangeNotifier {
 
       final isValid = await EmailOtpService.verifyOtp(nd.email, otpNhap.trim());
       if (!isValid) {
-        _error = '❌ Mã OTP không đúng hoặc đã hết hạn (10 phút)';
+        _error = ' Mã OTP không đúng hoặc đã hết hạn (10 phút)';
         return false;
       }
 
