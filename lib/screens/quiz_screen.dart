@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
-import 'dart:convert';
 import '../providers/bai_kt_provider.dart';
 import '../providers/nguoi_dung_provider.dart';
 import '../models/devtalk_model.dart';
@@ -154,10 +153,10 @@ class _BaiKTCardState extends State<_BaiKTCard> {
   @override
   Widget build(BuildContext context) {
     const grad = [
-      Color(0xFF374151), // xanh chính
-      Color(0xFF111827), // xanh đậm
+      Color(0xFF374151),
+      Color(0xFF111827),
     ];
-    
+
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
       onTapUp: (_) {
@@ -165,15 +164,15 @@ class _BaiKTCardState extends State<_BaiKTCard> {
         HapticFeedback.mediumImpact();
         final nd = context.read<NguoiDungProvider>().nguoiDung;
         if (nd == null) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Vui lòng đăng nhập')));
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Vui lòng đăng nhập')));
           return;
         }
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => LamBaiScreen(baiKT: widget.baiKT, maND: nd.maND!),
+            builder: (_) =>
+                LamBaiScreen(baiKT: widget.baiKT, maND: nd.maND!),
           ),
         );
       },
@@ -353,6 +352,7 @@ class _LichSuCardState extends State<_LichSuCard> {
         ),
         child: Row(
           children: [
+            // Score badge
             Container(
               width: 44,
               height: 44,
@@ -372,6 +372,7 @@ class _LichSuCardState extends State<_LichSuCard> {
               ),
             ),
             const SizedBox(width: 14),
+            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,7 +398,8 @@ class _LichSuCardState extends State<_LichSuCard> {
                       ),
                       Text(
                         ' · ',
-                        style: TextStyle(color: Colors.white.withOpacity(0.3)),
+                        style:
+                            TextStyle(color: Colors.white.withOpacity(0.3)),
                       ),
                       Text(
                         widget.ls.tgBatDau.substring(0, 10),
@@ -410,8 +412,7 @@ class _LichSuCardState extends State<_LichSuCard> {
                         Text(
                           ' · ',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.3),
-                          ),
+                              color: Colors.white.withOpacity(0.3)),
                         ),
                         Text(
                           '${widget.ls.tgLam}s',
@@ -426,6 +427,56 @@ class _LichSuCardState extends State<_LichSuCard> {
                 ],
               ),
             ),
+            // ── "Làm lại" button ──
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.mediumImpact();
+                final nd =
+                    context.read<NguoiDungProvider>().nguoiDung;
+                if (nd == null || baiKT == null) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        LamBaiScreen(baiKT: baiKT, maND: nd.maND!),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF7B2FFF), Color(0xFF00D4FF)],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF7B2FFF).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.replay_rounded,
+                        color: Colors.white, size: 14),
+                    SizedBox(width: 4),
+                    Text(
+                      'Làm lại',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
             Icon(
               Icons.chevron_right_rounded,
               color: Colors.white.withOpacity(0.3),
@@ -500,6 +551,122 @@ class _LamBaiScreenState extends State<LamBaiScreen>
     });
   }
 
+  // ── Count only non-empty answers ──
+  int get _answeredCount =>
+      _dapAn.entries.where((e) => e.value.trim().isNotEmpty).length;
+
+  // ── Count unanswered questions ──
+  int get _unansweredCount => _cauHoi
+      .where((ch) =>
+          !_dapAn.containsKey(ch.maCH) ||
+          (_dapAn[ch.maCH]?.trim().isEmpty ?? true))
+      .length;
+
+  // ── Show confirmation dialog before submitting ──
+  Future<void> _confirmAndSubmit() async {
+    if (_isSubmitting) return;
+
+    final unanswered = _unansweredCount;
+
+    if (unanswered > 0) {
+      // Not all answered – show warning and block submission
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          backgroundColor: const Color(0xFF131830),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          title: Row(
+            children: const [
+              Text('⚠️', style: TextStyle(fontSize: 22)),
+              SizedBox(width: 8),
+              Text(
+                'Chưa hoàn thành',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800),
+              ),
+            ],
+          ),
+          content: Text(
+            'Bạn còn $unanswered câu chưa trả lời.\nVui lòng hoàn thành tất cả câu hỏi trước khi nộp bài.',
+            style: TextStyle(
+                color: Colors.white.withOpacity(0.75), fontSize: 14, height: 1.5),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Tiếp tục làm',
+                style: TextStyle(
+                    color: Color(0xFF7B2FFF), fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // All answered – ask for confirmation
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF131830),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Row(
+          children: const [
+            Text('', style: TextStyle(fontSize: 22)),
+            SizedBox(width: 8),
+            Text(
+              'Xác nhận nộp bài',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800),
+            ),
+          ],
+        ),
+        content: Text(
+          'Bạn đã trả lời đủ ${_cauHoi.length}/${_cauHoi.length} câu hỏi.\nBạn có chắc muốn nộp bài không?',
+          style: TextStyle(
+              color: Colors.white.withOpacity(0.75), fontSize: 14, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Hủy',
+              style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontWeight: FontWeight.w600),
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(right: 4, bottom: 4),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                  colors: [Color(0xFF7B2FFF), Color(0xFF00D4FF)]),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text(
+                'Nộp bài',
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) _submit();
+  }
+
   Future<void> _submit({bool autoSubmit = false}) async {
     if (_isSubmitting) return;
     setState(() => _isSubmitting = true);
@@ -519,9 +686,8 @@ class _LamBaiScreenState extends State<LamBaiScreen>
         tongDiem += ch.trongSo;
       }
     }
-    final pct = maxDiem > 0
-        ? (tongDiem / maxDiem * widget.baiKT.tongDiem).round()
-        : 0;
+    final pct =
+        maxDiem > 0 ? (tongDiem / maxDiem * widget.baiKT.tongDiem).round() : 0;
 
     final ls = LSKiemTra(
       maND: widget.maND,
@@ -614,7 +780,8 @@ class _LamBaiScreenState extends State<LamBaiScreen>
       );
 
     final ch = _cauHoi[_currentIdx];
-    final answered = _dapAn.keys.length;
+    // ── FIX: use _answeredCount (excludes empty strings) ──
+    final answered = _answeredCount;
 
     return Scaffold(
       backgroundColor: const Color(0xFF080B1A),
@@ -697,13 +864,12 @@ class _LamBaiScreenState extends State<LamBaiScreen>
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 8,
-                    ),
+                        horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
                       color: _timerColor.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: _timerColor.withOpacity(0.4)),
+                      border:
+                          Border.all(color: _timerColor.withOpacity(0.4)),
                     ),
                     child: Text(
                       _timerStr,
@@ -736,16 +902,11 @@ class _LamBaiScreenState extends State<LamBaiScreen>
             // Question
             Expanded(
               child: SlideTransition(
-                position:
-                    Tween<Offset>(
-                      begin: const Offset(0.05, 0),
-                      end: Offset.zero,
-                    ).animate(
-                      CurvedAnimation(
-                        parent: _slideAnim,
-                        curve: Curves.easeOut,
-                      ),
-                    ),
+                position: Tween<Offset>(
+                  begin: const Offset(0.05, 0),
+                  end: Offset.zero,
+                ).animate(CurvedAnimation(
+                    parent: _slideAnim, curve: Curves.easeOut)),
                 child: FadeTransition(
                   opacity: _slideAnim,
                   child: SingleChildScrollView(
@@ -756,8 +917,8 @@ class _LamBaiScreenState extends State<LamBaiScreen>
                       children: [
                         Text(
                           'Câu ${_currentIdx + 1}/${_cauHoi.length}',
-                          style: TextStyle(
-                            color: const Color(0xFF7B2FFF),
+                          style: const TextStyle(
+                            color: Color(0xFF7B2FFF),
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                           ),
@@ -769,8 +930,7 @@ class _LamBaiScreenState extends State<LamBaiScreen>
                             color: Colors.white.withOpacity(0.05),
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.1),
-                            ),
+                                color: Colors.white.withOpacity(0.1)),
                           ),
                           child: Text(
                             ch.noiDung,
@@ -810,25 +970,20 @@ class _LamBaiScreenState extends State<LamBaiScreen>
                             color: Colors.white.withOpacity(0.06),
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.1),
-                            ),
+                                color: Colors.white.withOpacity(0.1)),
                           ),
                           child: const Center(
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
-                                  Icons.arrow_back_rounded,
-                                  color: Colors.white70,
-                                  size: 18,
-                                ),
+                                Icon(Icons.arrow_back_rounded,
+                                    color: Colors.white70, size: 18),
                                 SizedBox(width: 6),
                                 Text(
                                   'Trước',
                                   style: TextStyle(
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.w600),
                                 ),
                               ],
                             ),
@@ -840,9 +995,10 @@ class _LamBaiScreenState extends State<LamBaiScreen>
                   Expanded(
                     flex: 2,
                     child: GestureDetector(
+                      // ── Use _confirmAndSubmit for the last question ──
                       onTap: _currentIdx < _cauHoi.length - 1
                           ? _nextQuestion
-                          : () => _submit(),
+                          : _confirmAndSubmit,
                       child: Container(
                         height: 50,
                         decoration: BoxDecoration(
@@ -1024,10 +1180,12 @@ class _LamBaiScreenState extends State<LamBaiScreen>
             controller: _textCtrl,
             style: const TextStyle(color: Colors.white, fontSize: 15),
             cursorColor: const Color(0xFF7B2FFF),
-            onChanged: (v) => _dapAn[ch.maCH!] = v,
+            // ── FIX: wrap in setState so answered counter updates live ──
+            onChanged: (v) => setState(() => _dapAn[ch.maCH!] = v),
             decoration: InputDecoration(
               hintText: 'Nhập câu trả lời của bạn...',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
+              hintStyle:
+                  TextStyle(color: Colors.white.withOpacity(0.3)),
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(16),
             ),
@@ -1061,7 +1219,8 @@ class _DungSaiBtn extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: sel ? color.withOpacity(0.15) : Colors.white.withOpacity(0.04),
+          color:
+              sel ? color.withOpacity(0.15) : Colors.white.withOpacity(0.04),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: sel ? color : Colors.white.withOpacity(0.09),
@@ -1181,7 +1340,8 @@ class _KetQuaScreenState extends State<KetQuaScreen>
                   child: Column(
                     children: [
                       const SizedBox(height: 20),
-                      Text(_scoreEmoji, style: const TextStyle(fontSize: 56)),
+                      Text(_scoreEmoji,
+                          style: const TextStyle(fontSize: 56)),
                       const SizedBox(height: 16),
                       Text(
                         '${widget.ls.diem ?? 0}/${widget.tongDiem}',
@@ -1195,7 +1355,7 @@ class _KetQuaScreenState extends State<KetQuaScreen>
                       const SizedBox(height: 8),
                       Text(
                         widget.autoSubmit
-                            ? '⏰ Hết giờ - tự động nộp bài'
+                            ? ' Hết giờ - tự động nộp bài'
                             : 'Hoàn thành!',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.5),
@@ -1236,13 +1396,13 @@ class _KetQuaScreenState extends State<KetQuaScreen>
                       ),
                       const SizedBox(height: 12),
                       ...widget.cauHoi.asMap().entries.map(
-                        (e) => _CauHoiKetQua(
-                          idx: e.key,
-                          ch: e.value,
-                          dapAnUser:
-                              widget.ls.cauTraLoi[e.value.maCH.toString()],
-                        ),
-                      ),
+                            (e) => _CauHoiKetQua(
+                              idx: e.key,
+                              ch: e.value,
+                              dapAnUser: widget.ls.cauTraLoi[
+                                  e.value.maCH.toString()],
+                            ),
+                          ),
                     ],
                   ),
                 ),
@@ -1307,7 +1467,8 @@ class _CauHoiKetQua extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = _correct ? const Color(0xFF00FF94) : const Color(0xFFFF3CAC);
+    final color =
+        _correct ? const Color(0xFF00FF94) : const Color(0xFFFF3CAC);
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
@@ -1322,7 +1483,9 @@ class _CauHoiKetQua extends StatelessWidget {
           Row(
             children: [
               Icon(
-                _correct ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                _correct
+                    ? Icons.check_circle_rounded
+                    : Icons.cancel_rounded,
                 color: color,
                 size: 18,
               ),
