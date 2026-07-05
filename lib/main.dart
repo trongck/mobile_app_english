@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'providers/gt_provider.dart';
 import 'providers/nguoi_dung_provider.dart';
 import 'providers/tu_vung_provider.dart';
@@ -11,6 +12,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Tải biến môi trường từ file .env.local
+  await dotenv.load(fileName: '.env.local');
+
   // Lock to portrait
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -18,8 +22,8 @@ void main() async {
   ]);
 
   await Supabase.initialize(
-    url: 'https://nogdeylfdjttgymdgrpt.supabase.co',
-    anonKey: 'sb_publishable_LeXoTOUZ0u5wsn0dog94RA_5LYIw1vL',
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

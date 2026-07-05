@@ -23,7 +23,6 @@ class NguoiDungProvider extends ChangeNotifier {
 
   // ── OTP state ─────────────────────────────────────────────────────────────
   String? _pendingOtp;
-  DateTime? _otpExpiry;
   int? _pendingMaND;    // ID người dùng vừa đăng ký, chờ xác minh
   String? _pendingEmail; // Email tương ứng — fallback khi _pendingMaND bị null
 
@@ -32,7 +31,6 @@ class NguoiDungProvider extends ChangeNotifier {
   String? get error => _error;
   bool get daDangNhap => _nguoiDung != null;
   String? get authProvider => _authProvider;
-  bool get hasOtpPending => _pendingOtp != null && _pendingMaND != null;
 
   // ─── Session persistence ─────────────────────────────────────────────────
 
@@ -143,7 +141,6 @@ class NguoiDungProvider extends ChangeNotifier {
   Future<void> _guiOtp({required String email, String? userName}) async {
     final otp = EmailOtpService.generateOtp();
     _pendingOtp = otp;
-    _otpExpiry = DateTime.now().add(const Duration(minutes: 10));
     notifyListeners();
 
     try {
@@ -158,7 +155,9 @@ class NguoiDungProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('[NguoiDungProvider] _guiOtp error: $e');
       // Vẫn cho phép nhập OTP nếu gửi thất bại (dev mode: log OTP ra console)
-      debugPrint('>>> [DEV] OTP for $email: $otp <<<');
+      if (kDebugMode) {
+        debugPrint('>>> [DEV] OTP for $email: $otp <<<');
+      }
     }
     notifyListeners();
   }
@@ -209,7 +208,6 @@ class NguoiDungProvider extends ChangeNotifier {
 
   void _clearOtpState() {
     _pendingOtp = null;
-    _otpExpiry = null;
     _pendingMaND = null;
     _pendingEmail = null;
   }
@@ -243,7 +241,8 @@ class NguoiDungProvider extends ChangeNotifier {
         _error = 'Email không tồn tại';
         return false;
       }
-      if (nd.matKhau != matKhau) {
+      final isCorrect = await _repo.kiemTraMatKhau(matKhau, nd.matKhau);
+      if (!isCorrect) {
         _error = 'Mật khẩu không đúng';
         return false;
       }

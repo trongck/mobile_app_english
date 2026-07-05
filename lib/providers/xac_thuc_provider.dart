@@ -1,30 +1,34 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+/// Dịch vụ gửi và xác thực mã OTP qua Email dùng EmailJS và Supabase.
 class EmailOtpService {
-  // EmailJS config (giữ nguyên)
-  static const _serviceId = 'service_k84lh8h';
-  static const _templateId = 'template_zkxpumt';
-  static const _publicKey = 'bDlldZB1lDG-Bjz1x';
+  static String get _serviceId => dotenv.env['EMAILJS_SERVICE_ID'] ?? 'service_k84lh8h';
+  static String get _templateId => dotenv.env['EMAILJS_TEMPLATE_ID'] ?? 'template_zkxpumt';
+  static String get _publicKey => dotenv.env['EMAILJS_PUBLIC_KEY'] ?? 'bDlldZB1lDG-Bjz1x';
 
-  /// Sinh OTP 6 chữ số
+  /// Sinh mã OTP ngẫu nhiên gồm 6 chữ số.
   static String generateOtp() {
     final rng = Random.secure();
     return (100000 + rng.nextInt(900000)).toString();
   }
 
-  /// Gửi OTP qua EmailJS + LƯU VÀO DB để verify
+  /// Thực hiện gửi mã OTP đến email người nhận và lưu lại vào cơ sở dữ liệu để xác thực.
   static Future<bool> sendOtp({
     required String toEmail,
     required String otp,
     String? userName,
   }) async {
     try {
-      print(">>> Gửi OTP $otp tới $toEmail...");
+      if (kDebugMode) {
+        debugPrint(">>> Gửi OTP $otp tới $toEmail...");
+      }
 
-      // 1. Gửi email qua EmailJS
+      // Gửi email thông qua EmailJS
       final emailSent = await _sendViaEmailJs(
         toEmail: toEmail,
         otp: otp,
@@ -32,85 +36,78 @@ class EmailOtpService {
       );
 
       if (!emailSent) {
-        print("❌ EmailJS gửi thất bại");
+        debugPrint("❌ Gửi email qua EmailJS thất bại");
         return false;
       }
 
-      // 2. Lưu OTP vào DB để verify (bảng xacthucemail)
+      // Lưu mã OTP vào bảng xacthucemail để phục vụ đối chiếu
       final dbSaved = await _saveOtpToDb(toEmail, otp);
 
-      print(">>> ${dbSaved ? '✅' : '❌'} OTP lưu DB thành công");
+      debugPrint(">>> ${dbSaved ? '✅' : '❌'} Lưu OTP vào cơ sở dữ liệu thành công");
       return emailSent && dbSaved;
     } catch (e) {
-      print("❌ sendOtp error: $e");
+      debugPrint("❌ Lỗi trong quá trình gửi OTP: $e");
       return false;
     }
   }
 
-  /// Verify OTP từ DB (an toàn hơn so sánh in-memory)
+  /// Xác thực mã OTP người dùng nhập vào bằng cách đối chiếu với bản ghi trong cơ sở dữ liệu.
   static Future<bool> verifyOtp(String email, String otpInput) async {
-  try {
-    final sb = Supabase.instance.client;
-    
-    final response = await sb
-        .from('xacthucemail')
-        .select()
-        .eq('email', email)
-        .limit(1);
+    try {
+      final sb = Supabase.instance.client;
+      
+      final response = await sb
+          .from('xacthucemail')
+          .select()
+          .eq('email', email)
+          .limit(1);
 
-    if (response.isEmpty) {
-      print("❌ No OTP found");
-      return false;
-    }
-
-    final data = response.first;
-    final savedOtp = data['maotp'] as String;
-    final expiryStr = data['thoigianhethan'] as String?;
-    
-    print("🔍 RAW DB:");
-    print("OTP: $savedOtp");
-    print("Expiry: '$expiryStr'");
-    
-    // Check OTP trước
-    if (otpInput.trim() != savedOtp) {
-      print("❌ Wrong OTP");
-      return false;
-    }
-    
-    // Check time nếu có expiry
-    if (expiryStr != null) {
-      try {
-        DateTime expiry;
-        // Fix format nếu thiếu Z
-        final fixedExpiry = expiryStr.endsWith('Z') ? expiryStr : '$expiryStr.000Z';
-        expiry = DateTime.parse(fixedExpiry);
-        
-        final now = DateTime.now().toUtc(); 
-        final isValidTime = now.isBefore(expiry);
-        
-        print("⏰ Time check: now=$now | expiry=$expiry | valid=$isValidTime");
-        
-        if (!isValidTime) {
-          print("❌ Expired");
-          return false;
-        }
-      } catch (e) {
-        print("⚠️ Skip time check (parse error): $e");
-        // Vẫn cho qua nếu OTP đúng
+      if (response.isEmpty) {
+        debugPrint("❌ Không tìm thấy mã OTP cho email này");
+        return false;
       }
+
+      final data = response.first;
+      final savedOtp = data['maotp'] as String;
+      final expiryStr = data['thoigianhethan'] as String?;
+      
+      // Đối chiếu mã OTP
+      if (otpInput.trim() != savedOtp) {
+        debugPrint("❌ Mã OTP nhập vào không trùng khớp");
+        return false;
+      }
+      
+      // Kiểm tra thời hạn hiệu lực của mã OTP (10 phút)
+      if (expiryStr != null) {
+        try {
+          DateTime expiry;
+          final fixedExpiry = expiryStr.endsWith('Z') ? expiryStr : '$expiryStr.000Z';
+          expiry = DateTime.parse(fixedExpiry);
+          
+          final now = DateTime.now().toUtc(); 
+          final isValidTime = now.isBefore(expiry);
+          
+          if (!isValidTime) {
+            debugPrint("❌ Mã OTP đã hết hạn sử dụng");
+            return false;
+          }
+        } catch (e) {
+          debugPrint("⚠️ Lỗi kiểm tra thời gian hết hạn: $e. Tiếp tục xác thực nếu OTP khớp.");
+        }
+      }
+      
+      // Xóa OTP khỏi database sau khi xác thực thành công để bảo mật
+      await sb.from('xacthucemail').delete().eq('email', email);
+      debugPrint("✅ Xác thực OTP thành công!");
+      
+      return true;
+    } catch (e) {
+      debugPrint("❌ Lỗi trong quá trình xác thực OTP: $e");
+      return false;
     }
-    
-    // Cleanup
-    await sb.from('xacthucemail').delete().eq('email', email);
-    print("✅ SUCCESS!");
-    
-    return true;
-  } catch (e) {
-    print("❌ Error: $e");
-    return false;
   }
-}
-  // ── EmailJS gửi email (giữ nguyên code của bạn) ─────────────────────────
+
+  /// Gọi API của EmailJS để gửi email chứa mã OTP.
   static Future<bool> _sendViaEmailJs({
     required String toEmail,
     required String otp,
@@ -142,31 +139,22 @@ class EmailOtpService {
         .timeout(const Duration(seconds: 15));
 
     final success = response.statusCode == 200;
-    print("EmailJS: ${success ? '✅' : '❌'} ${response.statusCode}");
-    print("Response: ${response.body}");
-
+    debugPrint("EmailJS Status: ${success ? '✅' : '❌'} ${response.statusCode}");
     return success;
   }
 
-  // ── Lưu OTP vào bảng xacthucemail ────────────────────────────────────────
-  // FIX _saveOtpToDb:
-static Future<bool> _saveOtpToDb(String email, String otp) async {
-  final sb = Supabase.instance.client;
-  final expiry = DateTime.now().add(const Duration(minutes: 10));
-  
-  // ✅ FORMAT ĐÚNG: full ISO8601 với Z
-  final expiryIso = expiry.toUtc().toIso8601String();
-  
-  print(">>> SAVE: $expiryIso");
-  
-  final response = await sb.from('xacthucemail').upsert({
-    'email': email,
-    'maotp': otp,
-    'thoigianhethan': expiryIso,  // 2026-04-25T01:06:03.370928Z
-  }).select().limit(1);
-  
-  return response.isNotEmpty;
-}
-
-
+  /// Lưu trữ hoặc cập nhật mã OTP mới và thời gian hết hạn vào bảng xacthucemail.
+  static Future<bool> _saveOtpToDb(String email, String otp) async {
+    final sb = Supabase.instance.client;
+    final expiry = DateTime.now().add(const Duration(minutes: 10));
+    final expiryIso = expiry.toUtc().toIso8601String();
+    
+    final response = await sb.from('xacthucemail').upsert({
+      'email': email,
+      'maotp': otp,
+      'thoigianhethan': expiryIso,
+    }).select().limit(1);
+    
+    return response.isNotEmpty;
+  }
 }

@@ -5,14 +5,7 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'dart:convert';
 import 'dart:math' as math;
-
-// ════════════════════════════════════════════════════════════════════════════
-//  CONSTANTS
-// ════════════════════════════════════════════════════════════════════════════
-const _kGeminiKey = 'AIzaSyBk4xqBvdB4k1OzLak0lLC85q_IaU8hcKM';
-const _kGeminiModel = 'gemini-3-flash-preview';
-const _kGeminiUrl =
-    'https://generativelanguage.googleapis.com/v1beta/models/$_kGeminiModel:generateContent?key=$_kGeminiKey';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // ════════════════════════════════════════════════════════════════════════════
 //  DATA MODELS
@@ -159,9 +152,13 @@ class GeminiService {
       ],
     });
 
+    final geminiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
+    final geminiModel = dotenv.env['GEMINI_MODEL'] ?? 'gemini-3.5-flash';
+    final geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/$geminiModel:generateContent?key=$geminiKey';
+
     final response = await http
         .post(
-          Uri.parse(_kGeminiUrl),
+          Uri.parse(geminiUrl),
           headers: {'Content-Type': 'application/json'},
           body: body,
         )
@@ -248,6 +245,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
   final stt.SpeechToText _speech = stt.SpeechToText();
   bool _speechAvailable = false;
   bool _sttInitialized = false;
+  String? _sttInitError;
 
   // ── TTS ─────────────────────────────────────────────────────────────────
   final FlutterTts _tts = FlutterTts();
@@ -369,11 +367,13 @@ class _ChatbotScreenState extends State<ChatbotScreen>
 
       _sttInitialized = available;
       _speechAvailable = available;
+      _sttInitError = available ? null : 'permissionDeniedOrNotAvailable';
       if (mounted) setState(() {});
     } catch (e) {
       debugPrint('[STT] Init error: $e');
       _sttInitialized = false;
       _speechAvailable = false;
+      _sttInitError = e.toString();
       if (mounted) setState(() {});
     }
   }
@@ -466,12 +466,6 @@ class _ChatbotScreenState extends State<ChatbotScreen>
         });
         _scrollToBottom();
       }
-
-      // Đọc TTS đa ngôn ngữ
-      if (_ttsEnabled && _ttsReady && mounted) {
-        await Future.delayed(const Duration(milliseconds: 300));
-        await _speakBilingual(response);
-      }
     } catch (e) {
       debugPrint('[Chat] Error: $e');
       if (mounted) {
@@ -491,17 +485,19 @@ class _ChatbotScreenState extends State<ChatbotScreen>
   }
 
   // ── TTS đa ngôn ngữ: tách đoạn VI / EN rồi đọc lần lượt ────────────────
-  Future<void> _speakBilingual(String text) async {
+  Future<void> _speakBilingual(String text, {bool force = false}) async {
     if (!_ttsReady || !mounted) return;
 
     final segments = LangDetector.splitByLang(text);
     if (segments.isEmpty) return;
 
+    if (mounted) setState(() => _isSpeaking = true);
+
     // Giới hạn tối đa 4 đoạn để không quá dài
     final limited = segments.take(4).toList();
 
     for (final seg in limited) {
-      if (!mounted || !_ttsEnabled) break;
+      if (!mounted || (!_ttsEnabled && !force)) break;
 
       final lang = seg['lang']!;
       final segText = seg['text']!;
@@ -546,7 +542,7 @@ class _ChatbotScreenState extends State<ChatbotScreen>
         await _tts.stop();
         await Future.delayed(const Duration(milliseconds: 200));
       }
-      await _speakBilingual(text);
+      await _speakBilingual(text, force: true);
     } catch (e) {
       debugPrint('[TTS] speakSafe error: $e');
       if (mounted) setState(() => _isSpeaking = false);
@@ -575,8 +571,16 @@ class _ChatbotScreenState extends State<ChatbotScreen>
     if (!_sttInitialized) await _initSpeech();
 
     if (!_speechAvailable) {
-      _showSnack(
-          'Microphone chưa được cấp quyền. Vào Cài đặt → Ứng dụng → Cấp quyền Micro.');
+      if (_sttInitError != null &&
+          (_sttInitError!.contains('recognizerNotAvailable') ||
+           _sttInitError!.contains('not available') ||
+           _sttInitError!.contains('Speech recognition not available'))) {
+        _showSnack(
+            'Thiết bị chưa cài đặt hoặc chưa bật dịch vụ Google Speech Recognition. Vui lòng cài đặt ứng dụng Google (từ Play Store) và bật dịch vụ nhận diện giọng nói.');
+      } else {
+        _showSnack(
+            'Microphone chưa được cấp quyền hoặc dịch vụ không khả dụng. Vào Cài đặt → Ứng dụng → Cấp quyền Micro.');
+      }
       return;
     }
 

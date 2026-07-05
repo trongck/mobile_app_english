@@ -32,13 +32,8 @@ dependencies:
     sdk: flutter
   provider: ^6.1.2  # Dùng làm trạm phát sóng
   http: ^1.2.0      # Gọi các API từ điển tiếng Anh
-  google_generative_ai: ^0.4.3 # Giao tiếp chính thức với Gemini AI
+  flutter_dotenv: ^5.2.1 # Đọc biến môi trường từ .env.local
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-  sqflite: ^2.4.2
-  path: ^1.9.1
   smooth_page_indicator: ^2.0.1
   shared_preferences: ^2.3.2
   google_sign_in: ^6.2.1
@@ -72,6 +67,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+      - .env.local
       - assets/icon/
       - assets/images/
   # An image asset can refer to one or more resolution-specific "variants", see

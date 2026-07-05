@@ -25,7 +25,9 @@ class NhatKyProvider extends ChangeNotifier {
       final denNgayStr = _dateStr(now);
       final list = await _repo.layTheoKhoang(maND, tuNgayStr, denNgayStr);
       _nhatKy7Ngay = {for (final nk in list) nk.ngayHoc: nk.tgHoc};
-      _tinhChuoiNgay(list);
+      
+      final fullList = await _repo.layTheoND(maND);
+      _tinhChuoiNgay(fullList);
     } catch (e) {
       debugPrint('[NhatKyProvider] Error: $e');
     } finally {
@@ -74,8 +76,21 @@ class NhatKyProvider extends ChangeNotifier {
   void _tinhChuoiNgay(List<NhatKy> list) {
     final now = DateTime.now();
     int streak = 0;
-    for (int i = 0; i <= 30; i++) {
-      final d = now.subtract(Duration(days: i));
+    
+    final todayKey = _dateStr(now);
+    final yesterdayKey = _dateStr(now.subtract(const Duration(days: 1)));
+    
+    final studiedToday = list.any((nk) => nk.ngayHoc == todayKey && nk.tgHoc > 0);
+    final studiedYesterday = list.any((nk) => nk.ngayHoc == yesterdayKey && nk.tgHoc > 0);
+    
+    if (!studiedToday && !studiedYesterday) {
+      _chuoiNgay = 0;
+      return;
+    }
+    
+    DateTime startCheck = studiedToday ? now : now.subtract(const Duration(days: 1));
+    for (int i = 0; i <= 365; i++) {
+      final d = startCheck.subtract(Duration(days: i));
       final key = _dateStr(d);
       if (list.any((nk) => nk.ngayHoc == key && nk.tgHoc > 0)) {
         streak++;

@@ -203,6 +203,23 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               total: _questions.length,
               accent: accent,
               onBack: _back,
+              onSkip: () {
+                HapticFeedback.mediumImpact();
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (_, a, __) => const AuthScreen(
+                      trinhDo: 'A1',
+                      mucTieuCapDo: 'A2',
+                      hocVi: null,
+                      mucTieuPhut: 15,
+                    ),
+                    transitionsBuilder: (_, a, __, child) =>
+                        FadeTransition(opacity: a, child: child),
+                    transitionDuration: const Duration(milliseconds: 500),
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 8),
@@ -356,12 +373,14 @@ class _TopBar extends StatelessWidget {
   final int step, total;
   final Color accent;
   final VoidCallback onBack;
+  final VoidCallback onSkip;
 
   const _TopBar({
     required this.step,
     required this.total,
     required this.accent,
     required this.onBack,
+    required this.onSkip,
   });
 
   @override
@@ -391,28 +410,37 @@ class _TopBar extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        // Brand mark
-        Row(children: [
-          Container(
-            width: 8,
-            height: 8,
+        // Skip Button with micro-interactions
+        GestureDetector(
+          onTap: onSkip,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
-              color: accent,
-              shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: accent.withOpacity(0.6), blurRadius: 8)],
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withOpacity(0.08)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Bỏ qua',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.65),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Colors.white.withOpacity(0.65),
+                  size: 11,
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 8),
-          Text(
-            'DevTalk',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ]),
+        ),
       ]),
     );
   }

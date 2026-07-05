@@ -202,7 +202,6 @@ class TuVung {
   final String? vdVI;
   final String? tuLoai;
   final int? maCD;
-  final bool yeuThich;
 
   TuVung({
     this.maTu,
@@ -215,7 +214,6 @@ class TuVung {
     this.vdVI,
     this.tuLoai,
     this.maCD,
-    this.yeuThich = false,
   });
 
   Map<String, dynamic> toMap() {
@@ -230,7 +228,6 @@ class TuVung {
       'vdvi': vdVI,
       'tuloai': tuLoai,
       'macd': maCD,
-      'yeuthich': yeuThich ? 1 : 0,
     };
   }
 
@@ -246,7 +243,6 @@ class TuVung {
       vdVI: map['vdvi'] as String?,
       tuLoai: map['tuloai'] as String?,
       maCD: map['macd'] as int?,
-     
     );
   }
 
@@ -261,7 +257,6 @@ class TuVung {
     String? vdVI,
     String? tuLoai,
     int? maCD,
-   
   }) {
     return TuVung(
       maTu: maTu ?? this.maTu,
@@ -274,7 +269,6 @@ class TuVung {
       vdVI: vdVI ?? this.vdVI,
       tuLoai: tuLoai ?? this.tuLoai,
       maCD: maCD ?? this.maCD,
-      
     );
   }
 

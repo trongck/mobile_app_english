@@ -20,9 +20,6 @@ class GTProvider extends ChangeNotifier {
   Future<void> khoiTaoDuLieu() async {
     _setLoading(true);
     try {
-      // Nạp dữ liệu cứng lần đầu nếu bảng trống
-      await _repository.kiemTraVaNapDuLieuGoc();
-
       // Tải danh sách intro
       _danhSachIntro = await _repository.layDanhSachIntro();
       _errorMessage = null;

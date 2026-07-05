@@ -11,6 +11,10 @@ import 'tuvung_screen.dart';
 import 'quiz_screen.dart';
 import 'nguoidung_screen.dart';
 
+/// Giao diện chính (Shell) chứa thanh điều hướng Navigation Bar phía dưới.
+/// Quản lý việc chuyển đổi qua lại giữa các Tab chức năng (Từ Vựng, Quiz, Home, AI Chat, Hồ Sơ).
+/// Đồng thời, tự động kích hoạt tính giờ học tập của người dùng khi bắt đầu/kết thúc ứng dụng
+/// thông qua [NhatKyProvider].
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
   @override
@@ -28,6 +32,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   final List<AnimationController?> _rippleControllers = List.filled(5, null);
 
+  /// Lưu reference để gọi an toàn trong dispose() (tránh dùng context.read sau khi unmount)
+  late final NhatKyProvider _nhatKyProvider;
+
   @override
   void initState() {
     super.initState();
@@ -42,8 +49,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     }
     // Start learning session
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _nhatKyProvider = context.read<NhatKyProvider>();
       final nd = context.read<NguoiDungProvider>().nguoiDung;
-      if (nd != null) context.read<NhatKyProvider>().batDauSession(nd.maND!);
+      if (nd != null) _nhatKyProvider.batDauSession(nd.maND!);
     });
   }
 
@@ -53,8 +61,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     _navEntryAnim.dispose();
     _tabAnim.dispose();
     for (final c in _rippleControllers) c?.dispose();
-    // End session
-    context.read<NhatKyProvider>().ketThucSession();
+    // End session — sử dụng reference đã lưu thay vì context.read()
+    _nhatKyProvider.ketThucSession();
     super.dispose();
   }
 

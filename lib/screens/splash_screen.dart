@@ -6,6 +6,12 @@ import '../providers/gt_provider.dart';
 import 'main_screen.dart';
 import 'intro_screen.dart';
 
+/// Màn hình chờ (Splash Screen) khởi đầu của ứng dụng.
+/// Thực hiện kiểm tra trạng thái phiên đăng nhập (session) của người dùng:
+/// - Nếu đã đăng nhập: Phục hồi phiên và chuyển hướng thẳng vào [MainScreen].
+/// - Nếu chưa đăng nhập: Tải trước dữ liệu giới thiệu gốc và chuyển tới [IntroScreen].
+/// Màn hình này kết hợp các hiệu ứng vòng xoay quay ngược chiều, hiệu ứng hào quang tỏa rộng
+/// và nền lưới động (custom painters).
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
