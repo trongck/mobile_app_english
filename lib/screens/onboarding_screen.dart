@@ -18,7 +18,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   late AnimationController _accentCtrl;
   late Animation<double> _cardFade;
   late Animation<double> _cardY;
-  late Animation<double> _accentScale;
 
   String? _trinhDo;
   String? _mucTieuCapDo;
@@ -94,8 +93,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     _cardFade = CurvedAnimation(parent: _cardCtrl, curve: Curves.easeOut);
     _cardY = Tween<double>(begin: 40, end: 0).animate(
         CurvedAnimation(parent: _cardCtrl, curve: Curves.easeOutCubic));
-    _accentScale = Tween<double>(begin: 0.95, end: 1.05).animate(
-        CurvedAnimation(parent: _accentCtrl, curve: Curves.easeInOut));
     _cardCtrl.forward();
   }
 
@@ -717,7 +714,6 @@ class _TimeChipState extends State<_TimeChip> {
   @override
   Widget build(BuildContext context) {
     // Progress bar width proportional to minutes
-    final values = [5, 10, 15, 30, 60];
     final pct = (widget.value is int)
         ? (widget.value as int) / 60.0
         : 0.25;

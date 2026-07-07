@@ -244,7 +244,6 @@ class _NguoiDungScreenState extends State<NguoiDungScreen>
 
     final totalWords = tvP.tuDaHoc.length;
     final totalFav = tvP.tuYeuThich.length;
-    final totalQuiz = bktP.lichSu.length;
     final avgScore = bktP.lichSu.isEmpty
         ? 0
         : (bktP.lichSu.map((l) => l.diem ?? 0).fold(0, (a, b) => a + b) /

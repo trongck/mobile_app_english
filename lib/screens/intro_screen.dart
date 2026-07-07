@@ -87,14 +87,6 @@ class _IntroScreenState extends State<IntroScreen>
     _animController.forward();
   }
 
-  // ─── Responsive helper ────────────────────────────────────────────────────
-  // Trả về kích thước tỉ lệ theo chiều cao màn hình (tránh overflow).
-  double _rh(BuildContext context, double factor) =>
-      MediaQuery.of(context).size.height * factor;
-
-  double _rw(BuildContext context, double factor) =>
-      MediaQuery.of(context).size.width * factor;
-
   @override
   Widget build(BuildContext context) {
     final gtProvider = context.watch<GTProvider>();

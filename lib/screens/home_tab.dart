@@ -12,7 +12,6 @@ class _T {
   // Palette
   static const bg = Color(0xFF080B1A);
   static const surface1 = Color(0xFF0F1320);
-  static const surface2 = Color(0xFF151A2E);
   static const cyan = Color(0xFF00D4FF);
   static const violet = Color(0xFF7B2FFF);
   static const emerald = Color(0xFF00FF94);
@@ -55,7 +54,6 @@ class _T {
   static const double s16 = 16;
   static const double s20 = 20;
   static const double s24 = 24;
-  static const double s32 = 32;
 
   // Radius
   static const double rMd = 16;
@@ -1215,11 +1213,6 @@ class _ActionCardState extends State<_ActionCard> {
       ),
     );
   }
-}
-
-// Padding constant missing in _T — define here
-extension _TPadding on _T {
-  static const double s14 = 14;
 }
 
 const double _s14 = 14;

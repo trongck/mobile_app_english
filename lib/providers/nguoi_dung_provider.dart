@@ -22,7 +22,6 @@ class NguoiDungProvider extends ChangeNotifier {
   String? _authProvider;
 
   // ── OTP state ─────────────────────────────────────────────────────────────
-  String? _pendingOtp;
   int? _pendingMaND;    // ID người dùng vừa đăng ký, chờ xác minh
   String? _pendingEmail; // Email tương ứng — fallback khi _pendingMaND bị null
 
@@ -135,7 +134,6 @@ class NguoiDungProvider extends ChangeNotifier {
 
   Future<void> _guiOtp({required String email, String? userName}) async {
     final otp = EmailOtpService.generateOtp();
-    _pendingOtp = otp;
     notifyListeners();
 
     try {
@@ -202,7 +200,6 @@ class NguoiDungProvider extends ChangeNotifier {
   }
 
   void _clearOtpState() {
-    _pendingOtp = null;
     _pendingMaND = null;
     _pendingEmail = null;
   }
