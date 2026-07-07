@@ -8,7 +8,8 @@ import 'providers/tu_vung_provider.dart';
 import 'providers/bai_kt_provider.dart';
 import 'providers/nhat_ky_provider.dart';
 import 'screens/splash_screen.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'datas/DB_helper.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -21,10 +22,8 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-  );
+  // Khởi tạo kết nối qua DBHelper
+  await DBHelper.initialize();
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

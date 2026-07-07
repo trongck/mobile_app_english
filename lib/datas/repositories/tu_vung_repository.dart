@@ -1,9 +1,9 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../DB_helper.dart';
 import '../../models/devtalk_model.dart';
 
 /// Repository quản lý chủ đề từ vựng (bảng cdtuvung).
 class CDTuVungRepository {
-  final supabase = Supabase.instance.client;
+  final supabase = DBHelper.client;
 
   /// Lấy danh sách tất cả các chủ đề từ vựng.
   Future<List<CDTuVung>> layTatCa() async {
@@ -17,7 +17,7 @@ class CDTuVungRepository {
 
 /// Repository quản lý thông tin từ vựng chi tiết (bảng tuvung).
 class TuVungRepository {
-  final supabase = Supabase.instance.client;
+  final supabase = DBHelper.client;
 
   /// Lấy danh sách toàn bộ từ vựng, sắp xếp theo thứ tự bảng chữ cái.
   Future<List<TuVung>> layTatCa() async {
@@ -41,7 +41,7 @@ class TuVungRepository {
 
 /// Repository quản lý trạng thái tương tác từ vựng của cá nhân người dùng (bảng nguoidung_tuvung - yêu thích/đã học).
 class NguoiDungTuVungRepository {
-  final supabase = Supabase.instance.client;
+  final supabase = DBHelper.client;
 
   /// Thêm hoặc cập nhật trạng thái học tập (yêu thích/đã học) của người dùng đối với một từ vựng.
   Future<void> upsert(NguoiDungTuVung record) async {

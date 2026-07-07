@@ -7,9 +7,8 @@ import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-// ════════════════════════════════════════════════════════════════════════════
+
 //  DATA MODELS
-// ════════════════════════════════════════════════════════════════════════════
 enum ChatMode { freeChat, vocabLearn, pronunciation, quiz }
 
 // Ngôn ngữ nhận diện giọng nói
@@ -29,9 +28,8 @@ class ChatMessage {
   });
 }
 
-// ════════════════════════════════════════════════════════════════════════════
+
 //  LANGUAGE DETECTOR
-// ════════════════════════════════════════════════════════════════════════════
 class LangDetector {
   /// Trả về tỉ lệ ký tự Latin trong chuỗi (0.0 – 1.0).
   static double latinRatio(String text) {
@@ -101,9 +99,7 @@ class LangDetector {
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 //  GEMINI SERVICE
-// ════════════════════════════════════════════════════════════════════════════
 class GeminiService {
   static Future<String> sendMessage({
     required List<Map<String, dynamic>> history,
@@ -211,9 +207,7 @@ Focus on IT vocabulary: programming, cloud, AI, DevOps. Make it fun!''';
   }
 }
 
-// ════════════════════════════════════════════════════════════════════════════
 //  MAIN SCREEN
-// ════════════════════════════════════════════════════════════════════════════
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({super.key});
 

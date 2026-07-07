@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // lưu trữ local
 import '../datas/repositories/nguoi_dung_repository.dart';
 import '../models/devtalk_model.dart';
 import '../providers/xac_thuc_provider.dart';
@@ -69,11 +69,6 @@ class NguoiDungProvider extends ChangeNotifier {
 
   // ─── Email auth ──────────────────────────────────────────────────────────
 
-  /// Đăng ký email.
-  /// Trả về:
-  ///   1  = tạo tài khoản OK, đã gửi OTP  
-  ///  -1  = email đã tồn tại  
-  ///  -2  = lỗi khác  
   Future<int> dangKyEmail({
     required String email,
     required String matKhau,

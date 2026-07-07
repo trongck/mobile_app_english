@@ -1,9 +1,9 @@
-import "package:supabase_flutter/supabase_flutter.dart";
+import '../DB_helper.dart';
 import '../../models/devtalk_model.dart';
 
 /// Repository quản lý nhật ký học tập (thời lượng học hàng ngày) của người dùng.
 class NhatKyRepository {
-  final supabase = Supabase.instance.client;
+  final supabase = DBHelper.client;
 
   /// Thêm bản ghi nhật ký học tập mới.
   Future<int> them(NhatKy nk) async {

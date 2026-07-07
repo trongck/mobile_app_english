@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../datas/DB_helper.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Dịch vụ gửi và xác thực mã OTP qua Email dùng EmailJS và Supabase.
@@ -36,7 +36,7 @@ class EmailOtpService {
       );
 
       if (!emailSent) {
-        debugPrint("❌ Gửi email qua EmailJS thất bại");
+        debugPrint("Gửi email qua EmailJS thất bại");
         return false;
       }
 
@@ -46,7 +46,7 @@ class EmailOtpService {
       debugPrint(">>> ${dbSaved ? '✅' : '❌'} Lưu OTP vào cơ sở dữ liệu thành công");
       return emailSent && dbSaved;
     } catch (e) {
-      debugPrint("❌ Lỗi trong quá trình gửi OTP: $e");
+      debugPrint(" Lỗi trong quá trình gửi OTP: $e");
       return false;
     }
   }
@@ -54,7 +54,7 @@ class EmailOtpService {
   /// Xác thực mã OTP người dùng nhập vào bằng cách đối chiếu với bản ghi trong cơ sở dữ liệu.
   static Future<bool> verifyOtp(String email, String otpInput) async {
     try {
-      final sb = Supabase.instance.client;
+      final sb = DBHelper.client;
       
       final response = await sb
           .from('xacthucemail')
@@ -63,7 +63,7 @@ class EmailOtpService {
           .limit(1);
 
       if (response.isEmpty) {
-        debugPrint("❌ Không tìm thấy mã OTP cho email này");
+        debugPrint(" Không tìm thấy mã OTP cho email này");
         return false;
       }
 
@@ -73,7 +73,7 @@ class EmailOtpService {
       
       // Đối chiếu mã OTP
       if (otpInput.trim() != savedOtp) {
-        debugPrint("❌ Mã OTP nhập vào không trùng khớp");
+        debugPrint(" Mã OTP nhập vào không trùng khớp");
         return false;
       }
       
@@ -88,7 +88,7 @@ class EmailOtpService {
           final isValidTime = now.isBefore(expiry);
           
           if (!isValidTime) {
-            debugPrint("❌ Mã OTP đã hết hạn sử dụng");
+            debugPrint("Mã OTP đã hết hạn sử dụng");
             return false;
           }
         } catch (e) {
@@ -98,11 +98,11 @@ class EmailOtpService {
       
       // Xóa OTP khỏi database sau khi xác thực thành công để bảo mật
       await sb.from('xacthucemail').delete().eq('email', email);
-      debugPrint("✅ Xác thực OTP thành công!");
+      debugPrint(" Xác thực OTP thành công!");
       
       return true;
     } catch (e) {
-      debugPrint("❌ Lỗi trong quá trình xác thực OTP: $e");
+      debugPrint("Lỗi trong quá trình xác thực OTP: $e");
       return false;
     }
   }
@@ -145,7 +145,7 @@ class EmailOtpService {
 
   /// Lưu trữ hoặc cập nhật mã OTP mới và thời gian hết hạn vào bảng xacthucemail.
   static Future<bool> _saveOtpToDb(String email, String otp) async {
-    final sb = Supabase.instance.client;
+    final sb = DBHelper.client;
     final expiry = DateTime.now().add(const Duration(minutes: 10));
     final expiryIso = expiry.toUtc().toIso8601String();
     

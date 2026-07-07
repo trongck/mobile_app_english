@@ -1,9 +1,9 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../DB_helper.dart';
 import '../../models/devtalk_model.dart';
 
 /// Repository quản lý dữ liệu giới thiệu (intro/tutorial) của ứng dụng.
 class GTRepository {
-  final supabase = Supabase.instance.client;
+  final supabase = DBHelper.client;
 
   /// Lấy danh sách các trang giới thiệu, sắp xếp theo thứ tự hiển thị (tt).
   Future<List<GT>> layDanhSachIntro() async {

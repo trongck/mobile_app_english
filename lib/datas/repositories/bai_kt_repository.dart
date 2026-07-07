@@ -1,9 +1,9 @@
-import "package:supabase_flutter/supabase_flutter.dart";
+import '../DB_helper.dart';
 import '../../models/devtalk_model.dart';
 
 /// Repository quản lý thông tin các bài kiểm tra (đề thi).
 class BaiKTRepository {
-  final supabase = Supabase.instance.client;
+  final supabase = DBHelper.client;
 
   /// Lấy danh sách tất cả các bài kiểm tra hiện có.
   Future<List<BaiKT>> layTatCa() async {
@@ -17,7 +17,7 @@ class BaiKTRepository {
 
 /// Repository quản lý câu hỏi trong bài kiểm tra.
 class CauHoiKTRepository {
-  final supabase = Supabase.instance.client;
+  final supabase = DBHelper.client;
 
   /// Lấy danh sách câu hỏi của một bài kiểm tra theo mã bài kiểm tra (maBKT).
   Future<List<CauHoiKT>> layTheoBai(int maBKT) async {
@@ -32,7 +32,7 @@ class CauHoiKTRepository {
 
 /// Repository quản lý lịch sử làm bài kiểm tra của người dùng.
 class LSKiemTraRepository {
-  final supabase = Supabase.instance.client;
+  final supabase = DBHelper.client;
 
   /// Lưu lượt làm bài kiểm tra mới.
   Future<int> them(LSKiemTra ls) async {

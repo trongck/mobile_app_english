@@ -1,9 +1,9 @@
-import "package:supabase_flutter/supabase_flutter.dart";
+import '../DB_helper.dart';
 import '../../models/devtalk_model.dart';
 
 /// Repository quản lý thông tin người dùng trong cơ sở dữ liệu Supabase.
 class NguoiDungRepository {
-  final supabase = Supabase.instance.client;
+  final supabase = DBHelper.client;
 
   /// Thêm người dùng mới vào hệ thống. Trả về mã người dùng (maND) vừa tạo.
   Future<int> them(NguoiDung nd) async {
